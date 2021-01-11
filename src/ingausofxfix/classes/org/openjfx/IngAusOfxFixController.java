@@ -1,4 +1,4 @@
-/*
+package org.openjfx;/*
  * Copyright (C) 2020 Chris Good
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,32 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.openjfx;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.Collator;
-import java.text.SimpleDateFormat;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
-import java.util.ResourceBundle;
-import java.util.logging.Logger;
-import java.util.logging.*;
-//import java.util.logging.Logger;
-//import java.lang.System.Logger;
-//import java.lang.System.Logger.Level;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
@@ -51,15 +25,7 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -68,6 +34,34 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import javafx.util.Callback;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import java.io.*;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.Collator;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+//import java.util.logging.Logger;
+//import java.lang.System.Logger;
+//import java.lang.System.Logger.Level;
 
 /**
  *
@@ -76,7 +70,7 @@ import javafx.util.Callback;
 
 //public class IngAusOfxFixController {
     
-public class IngAusOfxFixController  implements Initializable{
+public class IngAusOfxFixController implements Initializable{
         /* class variables (static) */
 
     @FXML private GridPane grid;
@@ -156,8 +150,8 @@ public class IngAusOfxFixController  implements Initializable{
     private static final Font BOLD_FONT = Font.font("System", FontWeight.BOLD, 14);
     private static final Font NORMAL_FONT = Font.font("System", FontWeight.NORMAL, 14);
 
-    private static String dateMin = ""; // min date in input ofx file yyyymmdd
-    private static String dateMax = ""; // max date in input ofx file yyyymmdd
+    private static String dateMin = "20201201"; // min date in input ofx file yyyymmdd
+    private static String dateMax = "20200111"; // max date in input ofx file yyyymmdd
 
     @FXML
     public void handleBtnActionDelete(Event e) throws IOException {
@@ -462,10 +456,28 @@ public class IngAusOfxFixController  implements Initializable{
             try (BufferedReader reader = Files.newBufferedReader(pathOfxDirFilStr, CHAR_SET)) {
                 String line;
                 String tmpDate;
+
+                // Use an XML parser to search the file
+                DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                Document document = builder.parse(new File(String.valueOf(pathOfxDirFilStr)));
+
+                // These are unique elements in OFX so can be relied on
+                dateMin = getXmlString("DTSTART", document.getDocumentElement());
+                dateMax = getXmlString("DTEND", document.getDocumentElement());
+
+                if (dateMin != null && dateMax != null) { // Found the start and end date
+                    txtDateFrom.setText(dateMin);
+                    txtDateTo.setText(dateMax);
+                    return; // File read not required, dateMin and dateMax set from file vars
+                }
+
+                // Read the file for the min and max dates
                 while ((line = reader.readLine()) != null) {
-                    if (line.startsWith("<DTPOSTED>")) {
+                    if (line.contains("<DTPOSTED>")) {
+                        tmpDate = getLineXmlString("DTPOSTED", line);
                         // DTPOSTED is yyyymmddhhmmss - get yyyymmdd
-                        tmpDate = line.substring(10, 18);
+//                        tmpDate = line.substring(10, 18); // TODO fix for suncorp / all
+
 //                      System.out.println("getDatesFromFile(): tmpDate=" + tmpDate);
                         if (!tmpDate.matches("\\d\\d\\d\\d\\d\\d\\d\\d")) {
                             taLog.appendText("getDatesFromFile(): tmpDate not yyyymmdd : " + tmpDate);
@@ -484,7 +496,7 @@ public class IngAusOfxFixController  implements Initializable{
                         }
                     }
                 }
-            } catch (IOException x) {
+            } catch (IOException | SAXException | ParserConfigurationException x) {
                 System.err.format("getDateFromFile(): IOException: %s%n", x);
                 taLog.appendText("getDateFromFile(): IOException: " + x + "\n");
             }
@@ -492,6 +504,35 @@ public class IngAusOfxFixController  implements Initializable{
         txtDateFrom.setText(dateMin);
         txtDateTo.setText(dateMax);
     }
+
+    private String getLineXmlString(String tag, String line) {
+        InputSource source = new InputSource(new StringReader(line));
+        XPath xpath = XPathFactory.newInstance().newXPath();
+        Object field = null;
+        try {
+            field = xpath.evaluate("/", source, XPathConstants.NODE);
+        } catch (XPathExpressionException e) {
+            e.printStackTrace();
+        }
+        try {
+            return xpath.evaluate(tag, field);
+        } catch (XPathExpressionException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    protected String getXmlString(String tagName, Element element) {
+            NodeList list = element.getElementsByTagName(tagName);
+            if (list != null && list.getLength() > 0) {
+                NodeList subList = list.item(0).getChildNodes();
+                if (subList != null && subList.getLength() > 0) {
+                    return subList.item(0).getNodeValue();
+                }
+            }
+
+            return null;
+        }
 
     boolean isValidBankAcctName() {
         return (bankAcctComboBox.getValue() != null) && (! bankAcctComboBox.getValue().toString().equals(""));
@@ -839,7 +880,7 @@ public class IngAusOfxFixController  implements Initializable{
      *
      * @author cgood
      * @param e
-     * @throws java.io.IOException
+     * @throws IOException
      */
 
     /* Here is an example OFX Input file :
@@ -943,10 +984,10 @@ public class IngAusOfxFixController  implements Initializable{
                 // note line termination chars have been stripped by readLine()
 //                System.out.println("Line read: " + line);
                 linesIn++;
-                if (line.startsWith("<BANKACCTFROM>")) {
+                if (line.contains("<BANKACCTFROM>")) {
                     boolBankAcctFrom_found = true;
                 }
-                if (line.startsWith("<BANKTRANLIST>")) {
+                if (line.contains("<BANKTRANLIST>")) {
                     if (boolBankAcctFrom_found) {
                         taLog.appendText("Input file already has BANKACCTFROM details\n");
                     } else {
@@ -955,7 +996,7 @@ public class IngAusOfxFixController  implements Initializable{
                         linesOut = linesOut + 5;
                     }
                 }
-                if (line.startsWith("<STMTTRN>")) {     // start of a transaction
+                if (line.contains("<STMTTRN>")) {     // start of a transaction
                     boolInTransaction = true;
                     transIn++;
                     trnType = "";
@@ -967,21 +1008,21 @@ public class IngAusOfxFixController  implements Initializable{
                     continue; // don't write until we have checked date within range
                 }
                 if (boolInTransaction) {
-                    if ((line.startsWith("<TRNTYPE>"))) {
-                        trnType = line.replace("<TRNTYPE>", "");
+                    if ((line.contains("<TRNTYPE>"))) {
+//                        trnType = line.replace("<TRNTYPE>", "");
                         continue;  // don't write until we have checked date within range
                     } else {
-                        if (line.startsWith("<DTPOSTED>")) {
+                        if (line.contains("<DTPOSTED>")) {
                             // DTPOSTED is yyyymmddhhmmss
                             //  (hhmmss is zeroes for ING Australia)
-                            dtPosted = line.substring(10, 18);   // get yyyymmdd
+                            dtPosted = getLineXmlString("DTPOSTED", line); // get yyyymmdd // TODO fix for suncorp and all
         //                    System.out.println("handleBtnActionStart(): dtPosted=" + dtPosted);
                             if (dtPosted.matches("\\d\\d\\d\\d\\d\\d\\d\\d")) {
                                 if ((dtPosted.compareTo(txtDateFrom.getText()) >= 0)
                                 &&  (dtPosted.compareTo(txtDateTo.getText()) <= 0)) {
                                     boolTrnDateInRange = true;
-                                    writer.write("<STMTTRN>" + LINE_SEPARATOR);
-                                    writer.write("<TRNTYPE>" + trnType + LINE_SEPARATOR);
+                                    writer.write("          <STMTTRN>" + LINE_SEPARATOR);
+                                    writer.write(trnType);
                                     linesOut = linesOut + 2;
                                     transOut++;
                                 } else {
@@ -994,19 +1035,19 @@ public class IngAusOfxFixController  implements Initializable{
                                 continue;
                             }
                         } else {
-                            if (line.startsWith("<TRNAMT>")) {
+                            if (line.contains("<TRNAMT>")) {
                                 if (boolTrnDateInRange) {
-                                    trnAmt = line.replace("<TRNAMT>", "");
+                                    trnAmt = line.replaceAll("\\D+",""); // Removes all non digits
                                 } else {
                                     continue;
                                 }
                             } else {
-                                if (line.startsWith("<FITID>")) {
+                                if (line.contains("<FITID>")) {
                                     if (boolTrnDateInRange) {
                                         if (line.contains(".")) {
                                             taLog.appendText("FITID has already been fixed: " + line + "\n");
                                         } else {
-                                            line = line + "." + dtPosted + "." + trnAmt;
+                                            line = "            <FITID>" + dtPosted + "." + trnAmt + "</FITID>";
                                             transMod++;
                 //                          taLog.appendText("New FITID: " + line + "\n");
                                         }
@@ -1014,13 +1055,13 @@ public class IngAusOfxFixController  implements Initializable{
                                         continue;
                                     }
                                 } else {
-                                    if (line.startsWith("<NAME>")) {
+                                    if (line.contains("<NAME>")) {
                                         if (!boolTrnDateInRange) {
                                             continue;
                                         }
                                         nameStr = line;
                                     } else {
-                                        if (line.startsWith("<MEMO>")) {
+                                        if (line.contains("<MEMO>")) {
                                             if (!boolTrnDateInRange) {
                                                 continue;
                                             }
@@ -1031,15 +1072,15 @@ public class IngAusOfxFixController  implements Initializable{
                                             index = line.indexOf(" - ");
                                             if (nameStr.isEmpty() && index > -1
                                             &&  splitMemoChb.isSelected()) {
-                                                nameStr = "<NAME>" + line.substring(6, index);
+                                                nameStr = getLineXmlString("NAME", line); // TODO fix for suncorp and all
                                                 writer.write(nameStr + LINE_SEPARATOR);
                                                 if (line.length() > (index+2))
                                                 {
-                                                    line = "<MEMO>" + line.substring(index+3);
+                                                    line = getLineXmlString("MEMO", line); // TODO fix for suncorp and all
                                                 }
                                             }
                                         } else {
-                                            if (line.startsWith("</STMTTRN>")) {
+                                            if (line.contains("</STMTTRN>")) {
                                                 boolInTransaction = false;
                                                 if (!boolTrnDateInRange) {
                                                     continue;
