@@ -1,8 +1,11 @@
-IngAusOfxFix
+SuncorpAusOfxFix
+V# 3.00  13 Jan 2021 Trentan Healey
+    * Modernised to maven and working for Suncorp cleanup
 
-V# 2.01 10 Mar 2020 Chris Good
 
-    * Remove dist/IngAusOfxFix.jar - Leftover from java 8.
+V# 2.01  10 Mar 2020 Chris Good
+
+    * Remove dist/SuncorpAusOfxFix.jar - Leftover from java 8.
     * Replace bad tag <BR/> in <MEMO> with a space as causes empty transaction
       Description in GnuCash.
     * Fix bug where a Deleted Bank Acct Name was not also removed from

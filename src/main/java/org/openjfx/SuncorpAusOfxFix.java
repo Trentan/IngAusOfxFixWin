@@ -31,7 +31,7 @@ import java.io.IOException;
 
 /**
  * This project creates a new .ofx file from the file downloaded from
- *  ING Australia bank with the following modifications:
+ *  SUNCORP Australia bank with the following modifications:
  *  1. add missing BANKACCTFROM xml entity before BANKTRANLIST.
  *      This is needed because GnuCash doesn't find any transactions to import
  *       without this.
@@ -57,7 +57,7 @@ public class SuncorpAusOfxFix extends Application {
         scene = new Scene(loadFXML("SuncorpAusOfxFix"));
         scene.getStylesheets().add(getClass().getResource("SuncorpAusOfxFix.css").toExternalForm());
         stage.setScene(scene);
-        stage.setTitle("ING Australia OFX Fix");
+        stage.setTitle("Suncorp Australia OFX Fix");
         stage.show();
     }
 

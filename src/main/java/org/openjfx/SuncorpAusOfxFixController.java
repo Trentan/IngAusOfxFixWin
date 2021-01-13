@@ -472,7 +472,7 @@ public class SuncorpAusOfxFixController implements Initializable{
                     if (line.contains("<DTPOSTED>")) {
                         tmpDate = getLineXmlString("DTPOSTED", line);
                         // DTPOSTED is yyyymmddhhmmss - get yyyymmdd
-//                        tmpDate = line.substring(10, 18); // TODO fix for suncorp / all
+//                        tmpDate = line.substring(10, 18); // TODO fix for suncorp / all just get the yyyymmdd
 
 //                      System.out.println("getDatesFromFile(): tmpDate=" + tmpDate);
                         if (!tmpDate.matches("\\d\\d\\d\\d\\d\\d\\d\\d")) {
@@ -501,6 +501,7 @@ public class SuncorpAusOfxFixController implements Initializable{
         txtDateTo.setText(dateMax);
     }
 
+    /** This use XPath to parse the XML tag between <tag>value</tag> and get the value for the tag provided */
     private String getLineXmlString(String tag, String line) {
         InputSource source = new InputSource(new StringReader(line));
         XPath xpath = XPathFactory.newInstance().newXPath();
@@ -518,6 +519,7 @@ public class SuncorpAusOfxFixController implements Initializable{
         return null;
     }
 
+    /** This gets the first node found for the provided tag */
     protected String getXmlString(String tagName, Element element) {
             NodeList list = element.getElementsByTagName(tagName);
             if (list != null && list.getLength() > 0) {
@@ -863,7 +865,7 @@ public class SuncorpAusOfxFixController implements Initializable{
 
     /**
      * This function creates a new .ofx file from the file downloaded from
-     *  ING Australia bank with the following modifications:
+     *  SUNCORP Australia bank with the following modifications:
      *  1. add missing BANKACCTFROM xml entity before BANKTRANLIST.
      *      This is needed because GnuCash doesn't find any transactions to
      *      import without this.
@@ -915,6 +917,15 @@ public class SuncorpAusOfxFixController implements Initializable{
         <ACCTTYPE>SAVINGS                               "
         </BANKACCTFROM>                                 "
         <BANKTRANLIST>
+        <STMTTRN>
+        <TRNTYPE>DEBIT</TRNTYPE>
+        <DTPOSTED>20210108</DTPOSTED>
+        <TRNAMT>-11.90</TRNAMT>
+        <FITID>3</FITID>
+        <CHECKNUM>0</CHECKNUM>
+        <NAME><![CDATA[VISA PURCHASE   PAYPAL *KFC  STR]]></NAME>
+        <MEMO><![CDATA[VISA PURCHASE   PAYPAL *KFC  STRATHPIN 4029357733   01/01 AU AUD]]></MEMO>
+        </STMTTRN>
         <STMTTRN>                                   Start of 1st Transaction
         <TRNTYPE>CREDIT
         <DTPOSTED>20160630000000
@@ -1010,14 +1021,14 @@ public class SuncorpAusOfxFixController implements Initializable{
                     } else {
                         if (line.contains("<DTPOSTED>")) {
                             // DTPOSTED is yyyymmddhhmmss
-                            //  (hhmmss is zeroes for ING Australia)
+                            //  (hhmmss is zeroes for SUNCORP Australia)
                             dtPosted = getLineXmlString("DTPOSTED", line); // get yyyymmdd // TODO fix for suncorp and all
         //                    System.out.println("handleBtnActionStart(): dtPosted=" + dtPosted);
                             if (dtPosted.matches("\\d\\d\\d\\d\\d\\d\\d\\d")) {
                                 if ((dtPosted.compareTo(txtDateFrom.getText()) >= 0)
                                 &&  (dtPosted.compareTo(txtDateTo.getText()) <= 0)) {
                                     boolTrnDateInRange = true;
-                                    writer.write("          <STMTTRN>" + LINE_SEPARATOR);
+                                    writer.write("          <STMTTRN>" + LINE_SEPARATOR); //TODO Fix this to write the line correctly
                                     writer.write(trnType);
                                     linesOut = linesOut + 2;
                                     transOut++;
@@ -1043,7 +1054,7 @@ public class SuncorpAusOfxFixController implements Initializable{
                                         if (line.contains(".")) {
                                             taLog.appendText("FITID has already been fixed: " + line + "\n");
                                         } else {
-                                            line = "            <FITID>" + dtPosted + "." + trnAmt + "</FITID>";
+                                            line = "            <FITID>" + dtPosted + "." + trnAmt + "</FITID>"; //TODO Fix this to write the line correctly
                                             transMod++;
                 //                          taLog.appendText("New FITID: " + line + "\n");
                                         }
