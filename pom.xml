@@ -48,13 +48,15 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.6.1</version>
+                <version>3.8.1</version>
                 <configuration>
                     <source>${maven.compiler.release}</source>
                     <target>${maven.compiler.release}</target>
                 </configuration>
             </plugin>
 
+
+<!--        TODO    this might be better... https://github.com/openjfx/samples/blob/master/CommandLine/Non-modular/Maven/hellofx/pom.xml-->
             <plugin>
                 <artifactId>maven-shade-plugin</artifactId>
                 <executions>
