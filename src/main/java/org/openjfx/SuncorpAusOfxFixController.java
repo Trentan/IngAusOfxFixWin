@@ -36,6 +36,7 @@ import javafx.stage.Window;
 import javafx.util.Callback;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -43,6 +44,9 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -60,59 +64,86 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * @author mrNaturalOne
  */
 
 //public class SuncorpAusOfxFixController {
-    
-public class SuncorpAusOfxFixController implements Initializable{
-        /* class variables (static) */
 
-    @FXML private GridPane grid;
-    @FXML private Text     sceneTitle;
-    @FXML private Text     versionNo;
-    @FXML private Label     lblName;
-    @FXML private ComboBox  bankAcctComboBox;
-    @FXML private CheckBox  defaultChb;
-    @FXML private Button    btnDelete;
-    @FXML private Label     lblBankId;
-    @FXML private TextField txtBankId;
-    @FXML private Label     lblAcctNo;
-    @FXML private TextField txtAcctNo;
-    @FXML private Label     lblType;
-    @FXML private ComboBox  bankAcctTypeComboBox;
-    @FXML private Label     lblOfxDir;
-    @FXML private TextField txtOfxDir;
-    @FXML private Button    btnChooseOfxDir;
-    @FXML private Label     lblSplitMemo;
-    @FXML private CheckBox  splitMemoChb;
-    @FXML private Button    btnSaveSettings;
-    @FXML private Label     lblOfxFile;
-    @FXML private TextField txtOfxFile;
-    @FXML private Button    btnChooseOfxFile;
-    @FXML private Label     lblModDate;
-    @FXML private TextField txtDateFrom;
-    @FXML private TextField txtDateTo;
-    @FXML private Button    btnStart;
-    @FXML private Label     lblLog;
-    @FXML private TextArea  taLog;
+public class SuncorpAusOfxFixController implements Initializable {
+    /* class variables (static) */
+
+    @FXML
+    private GridPane grid;
+    @FXML
+    private Text sceneTitle;
+    @FXML
+    private Text versionNo;
+    @FXML
+    private Label lblName;
+    @FXML
+    private ComboBox bankAcctComboBox;
+    @FXML
+    private CheckBox defaultChb;
+    @FXML
+    private Button btnDelete;
+    @FXML
+    private Label lblBankId;
+    @FXML
+    private TextField txtBankId;
+    @FXML
+    private Label lblAcctNo;
+    @FXML
+    private TextField txtAcctNo;
+    @FXML
+    private Label lblType;
+    @FXML
+    private ComboBox bankAcctTypeComboBox;
+    @FXML
+    private Label lblOfxDir;
+    @FXML
+    private TextField txtOfxDir;
+    @FXML
+    private Button btnChooseOfxDir;
+    @FXML
+    private Label lblSplitMemo;
+    @FXML
+    private CheckBox splitMemoChb;
+    @FXML
+    private Button btnSaveSettings;
+    @FXML
+    private Label lblOfxFile;
+    @FXML
+    private TextField txtOfxFile;
+    @FXML
+    private Button btnChooseOfxFile;
+    @FXML
+    private Label lblModDate;
+    @FXML
+    private TextField txtDateFrom;
+    @FXML
+    private TextField txtDateTo;
+    @FXML
+    private Button btnStart;
+    @FXML
+    private Label lblLog;
+    @FXML
+    private TextArea taLog;
 
     final private static int MAX_BANKS = 100;
-//  final private ObservableList<Book> bankAcctComboBoxData = FXCollections.observableArrayList();
-    final private ObservableList       bankAcctComboBoxData = FXCollections.observableArrayList();
+    //  final private ObservableList<Book> bankAcctComboBoxData = FXCollections.observableArrayList();
+    final private ObservableList bankAcctComboBoxData = FXCollections.observableArrayList();
     final private Map bankAcctMap = new HashMap(MAX_BANKS); // key=bankAcctName, value=ref to BankAcct instance
 
     final ObservableList bankAcctTypeComboBoxData = FXCollections.observableArrayList(
-                "CHECKING", "CREDITLINE", "MONEYMRKT", "SAVINGS");
-    final private static String OS_NAME = System.getProperty("os.name" );
+            "CHECKING", "CREDITLINE", "MONEYMRKT", "SAVINGS");
+    final private static String OS_NAME = System.getProperty("os.name");
     private static String USER_NAME;
     // character that separates folders from files in paths
     //  i.e. Windows = backslash, Linux/OSX = /
     private static final char FILE_SEPARATOR =
-        System.getProperty("file.separator").charAt(0);
+            System.getProperty("file.separator").charAt(0);
     private static final String LINE_SEPARATOR =
-        System.getProperty("line.separator");
+            System.getProperty("line.separator");
     private static final String HOME_DIR = System.getProperty("user.home");
 
     private static String baName = "MyBankAcct";        // current bankAcct name
@@ -161,7 +192,7 @@ public class SuncorpAusOfxFixController implements Initializable{
         //  this user interface does not permit deleting the default bankAcct
 
         String tmpBankAcctName = (String) bankAcctComboBox.getValue();
-        if (((tmpBankAcctName != null) &&  (! tmpBankAcctName.isEmpty()))) {
+        if (((tmpBankAcctName != null) && (!tmpBankAcctName.isEmpty()))) {
             if (bankAcctMap.size() > 1) {
                 bankAcctMap.remove(tmpBankAcctName);
                 bankAcctComboBoxData.remove(tmpBankAcctName);
@@ -178,12 +209,11 @@ public class SuncorpAusOfxFixController implements Initializable{
 
         Enumeration<?> enumPropertyNames = defaultProps.propertyNames();
         String suffix = "";
-        while(enumPropertyNames.hasMoreElements())
-	{
+        while (enumPropertyNames.hasMoreElements()) {
             String key = (String) enumPropertyNames.nextElement();
             if (key != null && key.contains(ACCTNAME_PROP)) {
                 if (defaultProps.getProperty(key).equals(tmpBankAcctName)) {
-                    suffix = key.substring(key.indexOf(".")+1);
+                    suffix = key.substring(key.indexOf(".") + 1);
                     break;
                 }
             }
@@ -221,7 +251,7 @@ public class SuncorpAusOfxFixController implements Initializable{
             BankAcct refBook = (BankAcct) bankAcctMap.get(tmpBook);
             suffix = String.valueOf(i++);
             System.out.println("handleBtnActionSaveSettings: i=" + i +
-              " BankAcctName=" + refBook.getBankAcctName());
+                    " BankAcctName=" + refBook.getBankAcctName());
             defaultProps.setProperty(ACCTNAME_PROP + suffix, refBook.getBankAcctName());
             defaultProps.setProperty(BANKID_PROP + suffix, refBook.getBankAcctBankId());
             defaultProps.setProperty(ACCTNO_PROP + suffix, refBook.getBankAcctNo());
@@ -283,9 +313,9 @@ public class SuncorpAusOfxFixController implements Initializable{
         //    + " editted=" + editted);
 
         if
-        ( ( (selectedAcct != null) && (! selectedAcct.isEmpty()))
-          &&
-          ((bankAcctSelectionTarget.isEmpty()) || (bankAcctSelectionTarget.equals(selectedAcct)))
+        (((selectedAcct != null) && (!selectedAcct.isEmpty()))
+                &&
+                ((bankAcctSelectionTarget.isEmpty()) || (bankAcctSelectionTarget.equals(selectedAcct)))
         ) {
             // If new bankAcct (selected) already exists
             //   change to it and show related fields
@@ -306,18 +336,18 @@ public class SuncorpAusOfxFixController implements Initializable{
 //              txtOfxFile.setText("");
             } else {
                 BankAcct bankAcct = new BankAcct(
-                    selectedAcct,
-                    txtBankId.getText(),
-                    txtAcctNo.getText(),
-                    bankAcctTypeComboBox.getValue().toString(),
-                    txtOfxDir.getText(),
-                    splitMemoChb.isSelected());
+                        selectedAcct,
+                        txtBankId.getText(),
+                        txtAcctNo.getText(),
+                        bankAcctTypeComboBox.getValue().toString(),
+                        txtOfxDir.getText(),
+                        splitMemoChb.isSelected());
                 bankAcctMap.put(selectedAcct, bankAcct);
                 //bankAcctComboBox.setValue(selected);     // set selected Value - do NOT do here causes loop
                 bankAcctComboBoxData.add(selectedAcct);
             }
             if (BankAcct.getDefaultBankAcct().equals(selectedAcct)) {
-                if (! defaultChb.isSelected()) {
+                if (!defaultChb.isSelected()) {
                     defaultChb.setSelected(true);
                 }
             } else {
@@ -334,9 +364,8 @@ public class SuncorpAusOfxFixController implements Initializable{
         bankAcctComboBox.setVisibleRowCount(20);
 
         try (   // with resources
-            FileInputStream in = new FileInputStream(DEF_PROP);
-        )
-        {
+                FileInputStream in = new FileInputStream(DEF_PROP);
+        ) {
             int i = 0;
             String suffix;
             String tmpStr;
@@ -375,7 +404,7 @@ public class SuncorpAusOfxFixController implements Initializable{
                         SPLITMEMO_PROP + suffix));
 
                 BankAcct bankAcct = new BankAcct(baName, baBankId, baNo, baType,
-                  baOfxDir, baSplitMemo);
+                        baOfxDir, baSplitMemo);
                 bankAcctComboBoxData.add(baName);
                 bankAcctMap.put(baName, bankAcct);  // save ref to bankAcct in hashmap
 
@@ -392,7 +421,7 @@ public class SuncorpAusOfxFixController implements Initializable{
             }
             if (bankAcctComboBoxData.isEmpty()) {
                 BankAcct bankAcct = new BankAcct(baName, baBankId, baNo, baType,
-                  baOfxDir, baSplitMemo);
+                        baOfxDir, baSplitMemo);
                 bankAcctComboBoxData.add(baName);
                 bankAcctMap.put(baName, bankAcct);
             }
@@ -408,7 +437,7 @@ public class SuncorpAusOfxFixController implements Initializable{
 //              System.out.println("getUserDefaults: " + ex.getMessage());
                 BankAcct.setDefaultBankAcct(baName);
                 BankAcct bankAcct = new BankAcct(baName, baBankId, baNo, baType,
-                  baOfxDir, baSplitMemo);
+                        baOfxDir, baSplitMemo);
                 bankAcctComboBoxData.add(baName);
                 bankAcctMap.put(baName, bankAcct);
 //              bankAcctComboBox.setItems(new SortedList<>(bankAcctComboBoxData, Collator.getInstance()));  // JDK-8087838
@@ -430,9 +459,9 @@ public class SuncorpAusOfxFixController implements Initializable{
 
     /**
      * This function gets the range of transaction dates from the input OFX file
-     *  and shows them in screen fields txtDateFrom and txtDateTo.
+     * and shows them in screen fields txtDateFrom and txtDateTo.
      * Called whenever focus leaves txtOfxDir or txtOfxFile,
-     *  and after btnChooseOfxDir or btnChooseOfxFile is used.
+     * and after btnChooseOfxDir or btnChooseOfxFile is used.
      *
      * @author cgood
      */
@@ -443,8 +472,8 @@ public class SuncorpAusOfxFixController implements Initializable{
         txtDateFrom.setText("");
         txtDateTo.setText("");
 
-        if ( (txtOfxDir.getText()  == null) || (txtOfxDir.getText().equals(""))
-        ||   (txtOfxFile.getText() == null) || (txtOfxFile.getText().equals(""))) {
+        if ((txtOfxDir.getText() == null) || (txtOfxDir.getText().equals(""))
+                || (txtOfxFile.getText() == null) || (txtOfxFile.getText().equals(""))) {
             return;
         }
         pathOfxDirFilStr = Paths.get(txtOfxDir.getText() + FILE_SEPARATOR + txtOfxFile.getText());
@@ -501,7 +530,9 @@ public class SuncorpAusOfxFixController implements Initializable{
         txtDateTo.setText(dateMax);
     }
 
-    /** This use XPath to parse the XML tag between <tag>value</tag> and get the value for the tag provided */
+    /**
+     * This use XPath to parse the XML tag between <tag>value</tag> and get the value for the tag provided
+     */
     private String getLineXmlString(String tag, String line) {
         InputSource source = new InputSource(new StringReader(line));
         XPath xpath = XPathFactory.newInstance().newXPath();
@@ -519,29 +550,31 @@ public class SuncorpAusOfxFixController implements Initializable{
         return null;
     }
 
-    /** This gets the first node found for the provided tag */
+    /**
+     * This gets the first node found for the provided tag
+     */
     protected String getXmlString(String tagName, Element element) {
-            NodeList list = element.getElementsByTagName(tagName);
-            if (list != null && list.getLength() > 0) {
-                NodeList subList = list.item(0).getChildNodes();
-                if (subList != null && subList.getLength() > 0) {
-                    return subList.item(0).getNodeValue();
-                }
+        NodeList list = element.getElementsByTagName(tagName);
+        if (list != null && list.getLength() > 0) {
+            NodeList subList = list.item(0).getChildNodes();
+            if (subList != null && subList.getLength() > 0) {
+                return subList.item(0).getNodeValue();
             }
-
-            return null;
         }
 
+        return null;
+    }
+
     boolean isValidBankAcctName() {
-        return (bankAcctComboBox.getValue() != null) && (! bankAcctComboBox.getValue().toString().equals(""));
+        return (bankAcctComboBox.getValue() != null) && (!bankAcctComboBox.getValue().toString().equals(""));
     }
 
     boolean isValidBankId() {
-        return (txtBankId.getText() != null) && (! txtBankId.getText().equals(""));
+        return (txtBankId.getText() != null) && (!txtBankId.getText().equals(""));
     }
 
     boolean isValidAcctNo() {
-        return (txtAcctNo.getText() != null) && (! txtAcctNo.getText().equals(""));
+        return (txtAcctNo.getText() != null) && (!txtAcctNo.getText().equals(""));
     }
 
 //    boolean isValidAcctType() {
@@ -553,8 +586,8 @@ public class SuncorpAusOfxFixController implements Initializable{
             taLog.appendText("Please enter OFX Directory\n");
             return false;
         }
-        
-        if (! Files.isWritable(Paths.get(txtOfxDir.getText()))) {
+
+        if (!Files.isWritable(Paths.get(txtOfxDir.getText()))) {
             taLog.appendText("Error: OFX directory " + txtOfxDir.getText()
                     + " is not writable or does not exist\n");
             return false;
@@ -572,8 +605,8 @@ public class SuncorpAusOfxFixController implements Initializable{
             // show the Last Modified date/time
             //  FileTime epoch 1970-01-01T00:00:00Z (FileTime no longer used)
             try {
-               SimpleDateFormat sdfFormat = new SimpleDateFormat("EEE, dd/MM/yyyy hh:mm aa");
-               lblModDate.setText("Modified : " + sdfFormat.format(Files.getLastModifiedTime(pathOfxDirFilStr).toMillis()));
+                SimpleDateFormat sdfFormat = new SimpleDateFormat("EEE, dd/MM/yyyy hh:mm aa");
+                lblModDate.setText("Modified : " + sdfFormat.format(Files.getLastModifiedTime(pathOfxDirFilStr).toMillis()));
             } catch (IOException x) {
                 System.err.println(x);
                 lblModDate.setText("IOException getLastModifiedTime" + pathOfxDirFilStr.toString());
@@ -590,7 +623,7 @@ public class SuncorpAusOfxFixController implements Initializable{
             }
         } else {
             taLog.appendText("Error: Input OFX File " + pathOfxDirFilStr.toString() +
-                " is not readable or does not exist\n");
+                    " is not readable or does not exist\n");
             return false;
         }
         return true;
@@ -598,13 +631,13 @@ public class SuncorpAusOfxFixController implements Initializable{
 
     boolean isValidDateFrom() {
         if ((txtDateFrom.getText() == null)
-        ||  (txtDateFrom.getText().equals(""))
-        ||  (! txtDateFrom.getText().matches("\\d\\d\\d\\d\\d\\d\\d\\d"))) {
+                || (txtDateFrom.getText().equals(""))
+                || (!txtDateFrom.getText().matches("\\d\\d\\d\\d\\d\\d\\d\\d"))) {
             taLog.appendText("Please enter Date From YYYYMMDD\n");
             return false;
         }
         if ((txtDateTo.getText() != null)
-        &&  (txtDateFrom.getText().compareTo(txtDateTo.getText()) > 0)) {
+                && (txtDateFrom.getText().compareTo(txtDateTo.getText()) > 0)) {
             taLog.appendText("Error: Date From cannot be greater than Date To\n");
             return false;
         }
@@ -612,14 +645,14 @@ public class SuncorpAusOfxFixController implements Initializable{
     }
 
     boolean isValidDateTo() {
-        if ( (txtDateTo.getText() == null)
-        ||   (txtDateTo.getText().equals(""))
-        ||   (! txtDateTo.getText().matches("\\d\\d\\d\\d\\d\\d\\d\\d"))) {
+        if ((txtDateTo.getText() == null)
+                || (txtDateTo.getText().equals(""))
+                || (!txtDateTo.getText().matches("\\d\\d\\d\\d\\d\\d\\d\\d"))) {
             taLog.appendText("Please enter Date To YYYYMMDD\n");
             return false;
         }
         if ((txtDateFrom.getText() != null)
-        &&  (txtDateFrom.getText().compareTo(txtDateTo.getText()) > 0)) {
+                && (txtDateFrom.getText().compareTo(txtDateTo.getText()) > 0)) {
             taLog.appendText("Error: Date To cannot be less than Date From\n");
             return false;
         }
@@ -631,69 +664,69 @@ public class SuncorpAusOfxFixController implements Initializable{
         // Create Tooltips (mouse-over text)
 
         bankAcctComboBox.setTooltip(new Tooltip(
-            "Bank account name to be used for this bank account's backup settings.\n" +
-            "For example: MyBankAccount\n" +
-            "To add a new bank account name:\n" +
-            " Type the new bank account name in this combobox, then press ENTER,\n"  +
-            " then change the other fields (Bank Id, Account No, Account Type," +
-            " Ofx Directory and Split Memo).\n" +
-            "Use the Save Settings button to save the settings for all bank accounts."
+                "Bank account name to be used for this bank account's backup settings.\n" +
+                        "For example: MyBankAccount\n" +
+                        "To add a new bank account name:\n" +
+                        " Type the new bank account name in this combobox, then press ENTER,\n" +
+                        " then change the other fields (Bank Id, Account No, Account Type," +
+                        " Ofx Directory and Split Memo).\n" +
+                        "Use the Save Settings button to save the settings for all bank accounts."
         ));
 
         defaultChb.setTooltip(new Tooltip(
-            "Default:\n" +
-            "If ticked, this bank account is the default shown when this program starts.\n" +
-            "To make another bank account the default:\n" +
-            " First select the new default bank account, then tick this checkbox."
+                "Default:\n" +
+                        "If ticked, this bank account is the default shown when this program starts.\n" +
+                        "To make another bank account the default:\n" +
+                        " First select the new default bank account, then tick this checkbox."
         ));
 
         btnDelete.setTooltip(new Tooltip(
-            "Delete:\nDelete settings for the current bank account.\n" +
-            "The settings for the last remaining bank account and the default bank account cannot be deleted.\n" +
-            "To delete the default bank account, first make another bank account the default."
+                "Delete:\nDelete settings for the current bank account.\n" +
+                        "The settings for the last remaining bank account and the default bank account cannot be deleted.\n" +
+                        "To delete the default bank account, first make another bank account the default."
         ));
 
         btnSaveSettings.setTooltip(new Tooltip(
-            "Save Settings:\nSave all bank account settings in\n" + DEF_PROP + "."
+                "Save Settings:\nSave all bank account settings in\n" + DEF_PROP + "."
         ));
 
         txtOfxDir.setTooltip(new Tooltip(
-            "OFX Directory:\n" +
-            "The directory for the OFX data files for this bank account."
+                "OFX Directory:\n" +
+                        "The directory for the OFX data files for this bank account."
         ));
 
         splitMemoChb.setTooltip(new Tooltip(
-            "Split Memo: If checked and <NAME> is unused, and <MEMO> contains " +
-            "space-space:\n" +
-            "Text from <MEMO> before the first space-space is moved to <NAME>\n" +
-            " which GnuCash imports into Transaction Description\n" +
-            "Text from <MEMO> after the first space-space becomes the new <MEMO>\n" +
-            " which GnuCash imports into Memo of the bank account split."
+                "Split Memo: If checked and <NAME> is unused, and <MEMO> contains " +
+                        "space-space:\n" +
+                        "Text from <MEMO> before the first space-space is moved to <NAME>\n" +
+                        " which GnuCash imports into Transaction Description\n" +
+                        "Text from <MEMO> after the first space-space becomes the new <MEMO>\n" +
+                        " which GnuCash imports into Memo of the bank account split."
         ));
 
         txtOfxFile.setTooltip(new Tooltip(
-            "OFX File:\n" +
-            "The input file name within the OFX Directory.\n" +
-            "The output file name will be the input name suffixed with 'New' " +
-            " before the .ofx extension."
+                "OFX File:\n" +
+                        "The input file name within the OFX Directory.\n" +
+                        "The output file name will be the input name suffixed with 'New' " +
+                        " before the .ofx extension."
         ));
 
         txtDateFrom.setTooltip(new Tooltip(
-            "Date From YYYYMMDD:\n" +
-            "After Input OFX File is entered or selected, the file is read\n" +
-            "and the date range of transactions in the file is updated to the\n" +
-            "Date From and Date To screen fields.\n" +
-            "Modify Date From and/or Date To if only transactions for a\n" +
-            "particular date range are required to be output."
+                "Date From YYYYMMDD:\n" +
+                        "After Input OFX File is entered or selected, the file is read\n" +
+                        "and the date range of transactions in the file is updated to the\n" +
+                        "Date From and Date To screen fields.\n" +
+                        "Modify Date From and/or Date To if only transactions for a\n" +
+                        "particular date range are required to be output."
         ));
 
         txtDateTo.setTooltip(new Tooltip(
-            "Date To YYYYMMDD:\n" +
-            "After Input OFX File is entered or selected, the file is read\n" +
-            "and the date range of transactions in the file is updated to the\n" +
-            "Date From and Date To screen fields.\n" +
-            "Modify Date From and/or Date To if only transactions for a\n" +
-            "particular date range are required to be output."
+                "Date To YYYYMMDD:\n" +
+                        "After Input OFX File is entered or selected, the file is read\n" +
+                        "and the date range of transactions in the file is updated to the\n" +
+                        "Date From and Date To screen fields.\n" +
+                        "Modify Date From and/or Date To if only transactions for a\n" +
+                        "particular date range are required to be output."
         ));
     }
 
@@ -768,12 +801,12 @@ public class SuncorpAusOfxFixController implements Initializable{
         // you cannot make the default bank acct not the default.
         // This way you have to choose the new default.
         if ((boolBankAcctOK) && (bankAcctComboBoxData.size() > 1)
-        && (! bankAcctComboBox.getValue().equals(BankAcct.getDefaultBankAcct()))) {
+                && (!bankAcctComboBox.getValue().equals(BankAcct.getDefaultBankAcct()))) {
             if (defaultChb.isDisabled()) {
                 defaultChb.setDisable(false);       // Enable
             }
         } else {
-            if (! defaultChb.isDisabled()) {
+            if (!defaultChb.isDisabled()) {
                 defaultChb.setDisable(true);        // Disable
             }
         }
@@ -781,24 +814,24 @@ public class SuncorpAusOfxFixController implements Initializable{
         // enable or disable btnDelete
         // default bankAcct cannot be deleted
         if (((boolBankAcctOK) && (bankAcctComboBoxData.size() > 1)
-        && (! bankAcctComboBox.getValue().equals(BankAcct.getDefaultBankAcct())))) {
+                && (!bankAcctComboBox.getValue().equals(BankAcct.getDefaultBankAcct())))) {
             if (btnDelete.isDisabled()) {
                 btnDelete.setDisable(false);       // Enable
             }
         } else {
-            if (! btnDelete.isDisabled()) {
+            if (!btnDelete.isDisabled()) {
                 btnDelete.setDisable(true);        // Disable
             }
         }
 
         // enable or disable btnStart
         if (boolBankAcctOK && boolBankIdOk && boolAcctNoOk && boolOfxDirOk
-        &&  boolOfxFileOK && boolDatesOk) {
+                && boolOfxFileOK && boolDatesOk) {
             if (btnStart.isDisabled()) {        // if Disabled
                 btnStart.setDisable(false);     //     Enable
             }
         } else {
-            if (! btnStart.isDisabled()) {      // if Enabled
+            if (!btnStart.isDisabled()) {      // if Enabled
                 btnStart.setDisable(true);     //      Disable
             }
         }
@@ -814,7 +847,7 @@ public class SuncorpAusOfxFixController implements Initializable{
             // else
             //   Add current settings to BankAcct, bankAcctMap and bankAcctComboBoxData
             if (bankAcctMap.containsKey(bankAcctComboBox.getValue())) {
-                BankAcct bankAcct = (BankAcct)bankAcctMap.get(bankAcctComboBox.getValue());
+                BankAcct bankAcct = (BankAcct) bankAcctMap.get(bankAcctComboBox.getValue());
                 bankAcct.setBankAcctBankId(txtBankId.getText());
                 bankAcct.setBankAcctNo(txtAcctNo.getText());
                 bankAcct.setBankAcctType(bankAcctTypeComboBox.getValue().toString());
@@ -830,23 +863,23 @@ public class SuncorpAusOfxFixController implements Initializable{
 //                );
             } else {
                 BankAcct bankAcct = new BankAcct(bankAcctComboBox.getValue().toString(),
-                                     txtBankId.getText(),
-                                     txtAcctNo.getText(),
-                                     bankAcctTypeComboBox.getValue().toString(),
-                                     txtOfxDir.getText(),
-                                     splitMemoChb.isSelected());
+                        txtBankId.getText(),
+                        txtAcctNo.getText(),
+                        bankAcctTypeComboBox.getValue().toString(),
+                        txtOfxDir.getText(),
+                        splitMemoChb.isSelected());
                 bankAcctMap.put(bankAcctComboBox.getValue(), bankAcct);
                 bankAcctComboBoxData.add(bankAcctComboBox.getValue().toString());
             }
         } else {
-            if (! btnSaveSettings.isDisabled()) {      // if Enabled
+            if (!btnSaveSettings.isDisabled()) {      // if Enabled
                 btnSaveSettings.setDisable(true);     //      Disable
             }
         }
 
         // Change Focus to OFX File if everything else OK
-        if ((boolBankAcctOK && boolBankIdOk && boolAcctNoOk && boolOfxDirOk) && (! boolOfxFileOK) ) {
-            if (! txtOfxFile.isFocused()) {
+        if ((boolBankAcctOK && boolBankIdOk && boolAcctNoOk && boolOfxDirOk) && (!boolOfxFileOK)) {
+            if (!txtOfxFile.isFocused()) {
                 if (firstTime) {
                     firstTime = false;
                     // When run from initialize(), controls are not yet ready to handle focus
@@ -865,20 +898,20 @@ public class SuncorpAusOfxFixController implements Initializable{
 
     /**
      * This function creates a new .ofx file from the file downloaded from
-     *  SUNCORP Australia bank with the following modifications:
-     *  1. add missing BANKACCTFROM xml entity before BANKTRANLIST.
-     *      This is needed because GnuCash doesn't find any transactions to
-     *      import without this.
-     *  2. ensure Financial Institution Transaction ID (FITID) is unique for
-     *      every transaction by appending "." + DTPOSTED + "." + TRNAMT to the
-     *      input file FITID.
-     *      This is because FITID's are supposed to be unique for every
-     *      transaction within each bank account and GnuCash will treat
-     *      transactions with duplicate FITID's as already imported.
+     * SUNCORP Australia bank with the following modifications:
+     * 1. add missing BANKACCTFROM xml entity before BANKTRANLIST.
+     * This is needed because GnuCash doesn't find any transactions to
+     * import without this.
+     * 2. ensure Financial Institution Transaction ID (FITID) is unique for
+     * every transaction by appending "." + DTPOSTED + "." + TRNAMT to the
+     * input file FITID.
+     * This is because FITID's are supposed to be unique for every
+     * transaction within each bank account and GnuCash will treat
+     * transactions with duplicate FITID's as already imported.
      *
-     * @author cgood
      * @param e
      * @throws IOException
+     * @author cgood
      */
 
     /* Here is an example OFX Input file :
@@ -951,10 +984,8 @@ public class SuncorpAusOfxFixController implements Initializable{
           Transaction Description and
           Memo in the split for the imported Acct
     */
-
     @FXML
-    public void handleBtnActionStart(Event e) throws IOException
-    {
+    public void handleBtnActionStart(Event e) throws IOException, TransformerException {
         boolean boolBankAcctFrom_found = false;
         boolean boolbankTranList_found = false;
         boolean boolInTransaction = false;
@@ -966,16 +997,17 @@ public class SuncorpAusOfxFixController implements Initializable{
         String nameStr = "";
         Integer index = 0;
         final String bankAcctFromElement = "<BANKACCTFROM>" + LINE_SEPARATOR
-            + "<BANKID>" + txtBankId.getText() + LINE_SEPARATOR
-            + "<ACCTID>" + txtAcctNo.getText() + LINE_SEPARATOR
-            + "<ACCTTYPE>" + bankAcctTypeComboBox.getValue().toString() + LINE_SEPARATOR
-            + "</BANKACCTFROM>" + LINE_SEPARATOR;
+                + "<BANKID>" + txtBankId.getText() + LINE_SEPARATOR
+                + "<ACCTID>" + txtAcctNo.getText() + LINE_SEPARATOR
+                + "<ACCTTYPE>" + bankAcctTypeComboBox.getValue().toString() + LINE_SEPARATOR
+                + "</BANKACCTFROM>" + LINE_SEPARATOR;
         Integer transMod = 0;
         Integer transIn = 0;
         Integer transDrop = 0;
         Integer transOut = 0;
         Integer linesIn = 0;
         Integer linesOut = 0;
+        int indentLength = 0;
 
         Path pathOfxIn = Paths.get(txtOfxDir.getText() + FILE_SEPARATOR + txtOfxFile.getText());
         Path pathOfxOut = Paths.get(txtOfxDir.getText() + FILE_SEPARATOR + txtOfxFile.getText().replace(".ofx", "New.ofx"));
@@ -983,6 +1015,11 @@ public class SuncorpAusOfxFixController implements Initializable{
         taLog.clear();
         taLog.appendText("Reading: " + pathOfxIn.toString() + "\n");
         taLog.appendText("Writing: " + pathOfxOut.toString() + "\n");
+
+        // Format OFX to correct~! So processing can continue
+        String formattedXml = toPrettyString(Files.readString(pathOfxIn), 2);
+        Files.write( Paths.get(String.valueOf(pathOfxIn)), formattedXml.getBytes());
+
         try (BufferedReader reader = Files.newBufferedReader(pathOfxIn, CHAR_SET);
              BufferedWriter writer = Files.newBufferedWriter(pathOfxOut, CHAR_SET)) {
 
@@ -991,7 +1028,7 @@ public class SuncorpAusOfxFixController implements Initializable{
                 // note line termination chars have been stripped by readLine()
 //                System.out.println("Line read: " + line);
                 linesIn++;
-                if (line.contains("<BANKACCTFROM>")) {
+                if (line.contains("<BANKACCTFROM>") || line.contains("<CCACCTFROM>")) {
                     boolBankAcctFrom_found = true;
                 }
                 if (line.contains("<BANKTRANLIST>")) {
@@ -1004,6 +1041,11 @@ public class SuncorpAusOfxFixController implements Initializable{
                     }
                 }
                 if (line.contains("<STMTTRN>")) {     // start of a transaction
+                    if(indentLength == 0)
+                    {
+                        indentLength = findNonwhitespaceCharacter(line, indentLength);
+
+                    }
                     boolInTransaction = true;
                     transIn++;
                     trnType = "";
@@ -1022,13 +1064,15 @@ public class SuncorpAusOfxFixController implements Initializable{
                         if (line.contains("<DTPOSTED>")) {
                             // DTPOSTED is yyyymmddhhmmss
                             //  (hhmmss is zeroes for SUNCORP Australia)
-                            dtPosted = getLineXmlString("DTPOSTED", line); // get yyyymmdd // TODO fix for suncorp and all
-        //                    System.out.println("handleBtnActionStart(): dtPosted=" + dtPosted);
-                            if (dtPosted.matches("\\d\\d\\d\\d\\d\\d\\d\\d")) {
+                            dtPosted = Objects.requireNonNull(getLineXmlString("DTPOSTED", line)).substring(0, 8); // get yyyymmdd // TODO fix for suncorp and all
+                            //                    System.out.println("handleBtnActionStart(): dtPosted=" + dtPosted);
+                            if (dtPosted.matches("\\d\\d\\d\\d\\d\\d\\d\\d")
+                            ) {
                                 if ((dtPosted.compareTo(txtDateFrom.getText()) >= 0)
-                                &&  (dtPosted.compareTo(txtDateTo.getText()) <= 0)) {
+                                        && (dtPosted.compareTo(txtDateTo.getText()) <= 0)) {
                                     boolTrnDateInRange = true;
-                                    writer.write("          <STMTTRN>" + LINE_SEPARATOR); //TODO Fix this to write the line correctly
+                                    // Good STMTTRN so can write now, get the indent length in case
+                                    writer.write("\t\t\t<STMTTRN>" + LINE_SEPARATOR); //TODO Fix this to write the line correctly
                                     writer.write(trnType);
                                     linesOut = linesOut + 2;
                                     transOut++;
@@ -1044,7 +1088,7 @@ public class SuncorpAusOfxFixController implements Initializable{
                         } else {
                             if (line.contains("<TRNAMT>")) {
                                 if (boolTrnDateInRange) {
-                                    trnAmt = line.replaceAll("\\D+",""); // Removes all non digits
+                                    trnAmt = line.replaceAll("\\D+", ""); // Removes all non digits
                                 } else {
                                     continue;
                                 }
@@ -1054,9 +1098,9 @@ public class SuncorpAusOfxFixController implements Initializable{
                                         if (line.contains(".")) {
                                             taLog.appendText("FITID has already been fixed: " + line + "\n");
                                         } else {
-                                            line = "            <FITID>" + dtPosted + "." + trnAmt + "</FITID>"; //TODO Fix this to write the line correctly
+                                            line = "\t\t\t<FITID>" + dtPosted + "." + trnAmt + "</FITID>"; //TODO Fix this to write the line correctly
                                             transMod++;
-                //                          taLog.appendText("New FITID: " + line + "\n");
+                                            //                          taLog.appendText("New FITID: " + line + "\n");
                                         }
                                     } else {
                                         continue;
@@ -1078,12 +1122,13 @@ public class SuncorpAusOfxFixController implements Initializable{
                                             //    optionally Split MEMO into NAME & MEMO
                                             index = line.indexOf(" - ");
                                             if (nameStr.isEmpty() && index > -1
-                                            &&  splitMemoChb.isSelected()) {
-                                                nameStr = getLineXmlString("NAME", line); // TODO fix for suncorp and all
-                                                writer.write(nameStr + LINE_SEPARATOR);
-                                                if (line.length() > (index+2))
-                                                {
-                                                    line = getLineXmlString("MEMO", line); // TODO fix for suncorp and all
+                                                    && splitMemoChb.isSelected()) {
+                                                if (line.contains("NAME")) {
+                                                    nameStr = getLineXmlString("NAME", line); // TODO fix for suncorp and all
+                                                    writer.write(nameStr + LINE_SEPARATOR);
+                                                    if (line.length() > (index + 2)) {
+                                                        line = getLineXmlString("MEMO", line); // TODO fix for suncorp and all
+                                                    }
                                                 }
                                             }
                                         } else {
@@ -1127,7 +1172,7 @@ public class SuncorpAusOfxFixController implements Initializable{
         fileChooser.setTitle("Choose OFX file");
 
         if ((txtOfxFile.getText() == null)
-        ||  (txtOfxFile.getText().isEmpty())) {
+                || (txtOfxFile.getText().isEmpty())) {
             txtOfxFile.setText(baOfxFile);
             enable_or_disable_buttons();
         }
@@ -1173,7 +1218,7 @@ public class SuncorpAusOfxFixController implements Initializable{
         directoryChooser.setTitle("Choose OFX Directory");
 
         if ((txtOfxDir.getText() == null)
-        ||  (txtOfxDir.getText().isEmpty())) {
+                || (txtOfxDir.getText().isEmpty())) {
             txtOfxDir.setText(baOfxDir);
             enable_or_disable_buttons();
         }
@@ -1208,18 +1253,14 @@ public class SuncorpAusOfxFixController implements Initializable{
     }
 
 
-    
-    
-    
 //  public void initialize() {
 //      String javaVersion = System.getProperty("java.version");
 //      String javafxVersion = System.getProperty("javafx.version");
 //      label.setText("Hello, JavaFX " + javafxVersion + "\nRunning on Java " + javaVersion + ".");
 //  }
-    
-    
-    
-//  @Override
+
+
+    //  @Override
     public void initialize(URL location, ResourceBundle resources) {
 //        throw new UnsupportedOperationException("Not supported yet.");
 //        To change body of generated methods, choose Tools | Templates.
@@ -1229,7 +1270,7 @@ public class SuncorpAusOfxFixController implements Initializable{
         // create dir $HOME/.SuncorpAusOfxFix if doesn't already exist
         Boolean boolPropDirOK = true;
         Path pthProp = Paths.get(DEF_PROP).getParent();
-        if (! Files.exists(pthProp)) {
+        if (!Files.exists(pthProp)) {
             try {
                 Files.createDirectory(pthProp);
             } catch (IOException ex) {
@@ -1243,20 +1284,23 @@ public class SuncorpAusOfxFixController implements Initializable{
         // bankAcctComboBox CellFactory : Make default bankAcct bold in dropdown list
 
         bankAcctComboBox.setCellFactory(
-        new Callback<ListView<String>, ListCell<String>>() {
-            @Override public ListCell<String> call(ListView<String> param) {
-            final ListCell<String> cell = new ListCell<String>() {
-                {   // instance initializer
-                    super.setPrefWidth(100);
-                    fontProperty().bind(Bindings.when(itemProperty().isEqualTo(BankAcct.defaultProp))
-                    .then(BOLD_FONT)
-                    .otherwise(NORMAL_FONT));
-                }
-                @Override public void updateItem(String item,
-                    boolean empty) {
-                        super.updateItem(item, empty);
-                        if (item != null) {
-                            setText(item);
+                new Callback<ListView<String>, ListCell<String>>() {
+                    @Override
+                    public ListCell<String> call(ListView<String> param) {
+                        final ListCell<String> cell = new ListCell<String>() {
+                            {   // instance initializer
+                                super.setPrefWidth(100);
+                                fontProperty().bind(Bindings.when(itemProperty().isEqualTo(BankAcct.defaultProp))
+                                        .then(BOLD_FONT)
+                                        .otherwise(NORMAL_FONT));
+                            }
+
+                            @Override
+                            public void updateItem(String item,
+                                                   boolean empty) {
+                                super.updateItem(item, empty);
+                                if (item != null) {
+                                    setText(item);
 //                                  if (item.equals(BankAcct.getDefaultBankAcct())) {
 //                                      setFont(Font.font("System", FontWeight.BOLD, 14));
 //                                      System.out.println("bankAcctComboBox.setCellFactory: set BOLD item=" + item);
@@ -1265,15 +1309,14 @@ public class SuncorpAusOfxFixController implements Initializable{
 //                                      setFont(Font.font("System", FontWeight.NORMAL, 14));
 //                                      System.out.println("bankAcctComboBox.setCellFactory: set NORMAL item=" + item);
 //                                  }
-                        }
-                        else {
-                            setText(null);
-                        }
+                                } else {
+                                    setText(null);
+                                }
+                            }
+                        };
+                        return cell;
                     }
-                };
-                return cell;
-            }
-        });
+                });
 
         // handle changes to checkbox defaultChb
 
@@ -1355,8 +1398,8 @@ public class SuncorpAusOfxFixController implements Initializable{
         // handle changes to splitMemoChb when it looses focus so that a new value
         //  is updated into BankAcct.bankSplitMemo
         splitMemoChb.focusedProperty().addListener((ObservableValue<? extends Boolean> o, Boolean wasFocused, Boolean isNowFocused) -> {
-              System.out.println("splitMemoChb.focusedProperty has changed" +
-                  " oldVal=" + wasFocused + " newVal=" + isNowFocused + " o=" + o);
+            System.out.println("splitMemoChb.focusedProperty has changed" +
+                    " oldVal=" + wasFocused + " newVal=" + isNowFocused + " o=" + o);
             if (wasFocused) {
                 // has just lost focus
                 enable_or_disable_buttons();
@@ -1413,4 +1456,48 @@ public class SuncorpAusOfxFixController implements Initializable{
         }
     }
 
+    public static String toPrettyString(String xml, int indent) {
+        try {
+            // Turn xml string into a document
+            Document document = DocumentBuilderFactory.newInstance()
+                    .newDocumentBuilder()
+                    .parse(new InputSource(new ByteArrayInputStream(xml.getBytes("utf-8"))));
+
+            // Remove whitespaces outside tags
+            document.normalize();
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            NodeList nodeList = (NodeList) xPath.evaluate("//text()[normalize-space()='']",
+                    document,
+                    XPathConstants.NODESET);
+
+            for (int i = 0; i < nodeList.getLength(); ++i) {
+                Node node = nodeList.item(i);
+                node.getParentNode().removeChild(node);
+            }
+
+            // Setup pretty print options
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setAttribute("indent-number", indent);
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+
+            // Return pretty print xml string
+            StringWriter stringWriter = new StringWriter();
+            transformer.transform(new DOMSource(document), new StreamResult(stringWriter));
+            return stringWriter.toString();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static int findNonwhitespaceCharacter(String s, int index) {
+        int sLength = s.length();
+        while (index < sLength && Character.isWhitespace(s.charAt(index))) {
+            index++;
+        }
+
+        return index;
+    }
 }

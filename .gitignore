@@ -1,2 +1,7 @@
 build/
 dist/
+/.idea/.gitignore
+/.idea/ant.xml
+/.idea/IngAusOfxFixWin.iml
+/.idea/modules.xml
+/.idea/vcs.xml
