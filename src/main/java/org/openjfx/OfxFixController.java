@@ -67,9 +67,9 @@ import java.util.logging.Logger;
  * @author mrNaturalOne
  */
 
-//public class SuncorpAusOfxFixController {
+//public class OfxFixController {
 
-public class SuncorpAusOfxFixController implements Initializable {
+public class OfxFixController implements Initializable {
     /* class variables (static) */
 
     @FXML
@@ -167,7 +167,7 @@ public class SuncorpAusOfxFixController implements Initializable {
     private static final String SPLITMEMO_PROP = "splitMemo.";
 
     private static final String DEF_PROP = HOME_DIR + FILE_SEPARATOR
-            + ".SuncorpAusOfxFix" + FILE_SEPARATOR + "defaultProperties";
+            + ".OfxFix" + FILE_SEPARATOR + "defaultProperties";
     //  default properties
     private static final Properties defaultProps = new Properties();
 
@@ -266,7 +266,7 @@ public class SuncorpAusOfxFixController implements Initializable {
         } catch (IOException ex) {
             //System.out.println("My Exception Message " + ex.getMessage());
             //System.out.println("My Exception Class " + ex.getClass());
-            Logger.getLogger(SuncorpAusOfxFixController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(OfxFixController.class.getName()).log(Level.SEVERE, null, ex);
             taLog.setText("Error: Cannot Save Settings to : " + DEF_PROP);
         }
     }
@@ -446,7 +446,7 @@ public class SuncorpAusOfxFixController implements Initializable {
                 splitMemoChb.setSelected(baSplitMemo);
                 defaultChb.setSelected(true);
             } else {
-                Logger.getLogger(SuncorpAusOfxFixController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(OfxFixController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 
@@ -501,8 +501,6 @@ public class SuncorpAusOfxFixController implements Initializable {
                     if (line.contains("<DTPOSTED>")) {
                         tmpDate = getLineXmlString("DTPOSTED", line);
                         // DTPOSTED is yyyymmddhhmmss - get yyyymmdd
-//                        tmpDate = line.substring(10, 18); // TODO fix for suncorp / all just get the yyyymmdd
-
 //                      System.out.println("getDatesFromFile(): tmpDate=" + tmpDate);
                         if (!tmpDate.matches("\\d\\d\\d\\d\\d\\d\\d\\d")) {
                             taLog.appendText("getDatesFromFile(): tmpDate not yyyymmdd : " + tmpDate);
@@ -547,7 +545,7 @@ public class SuncorpAusOfxFixController implements Initializable {
         } catch (XPathExpressionException e) {
             e.printStackTrace();
         }
-        return null;
+        return ""; // not null
     }
 
     /**
@@ -898,7 +896,7 @@ public class SuncorpAusOfxFixController implements Initializable {
 
     /**
      * This function creates a new .ofx file from the file downloaded from
-     * SUNCORP Australia bank with the following modifications:
+     * bank with the following modifications:
      * 1. add missing BANKACCTFROM xml entity before BANKTRANLIST.
      * This is needed because GnuCash doesn't find any transactions to
      * import without this.
@@ -964,7 +962,7 @@ public class SuncorpAusOfxFixController implements Initializable {
         <DTPOSTED>20160630000000
         <TRNAMT>5.23
         <FITID>903889                                       MUST BE UNIQUE
-        <NAME>Transaction Description                   <NAME> NOT output by ING, only SuncorpAusOfxFix
+        <NAME>Transaction Description                   <NAME> NOT output by ING, only OfxFix
         <MEMO>Bonus Interest Credit - Receipt 903889    <MEMO> goes to Memo split of the imported Acct
         </STMTTRN>
         <STMTTRN>                                   Start of 2nd Transaction
@@ -1007,7 +1005,8 @@ public class SuncorpAusOfxFixController implements Initializable {
         Integer transOut = 0;
         Integer linesIn = 0;
         Integer linesOut = 0;
-        int indentLength = 0;
+        int indentLengthSTMTTRN = 0;
+        int indentLengthFITID = 0;
 
         Path pathOfxIn = Paths.get(txtOfxDir.getText() + FILE_SEPARATOR + txtOfxFile.getText());
         Path pathOfxOut = Paths.get(txtOfxDir.getText() + FILE_SEPARATOR + txtOfxFile.getText().replace(".ofx", "New.ofx"));
@@ -1018,7 +1017,7 @@ public class SuncorpAusOfxFixController implements Initializable {
 
         // Format OFX to correct~! So processing can continue
         String formattedXml = toPrettyString(Files.readString(pathOfxIn), 2);
-        Files.write( Paths.get(String.valueOf(pathOfxIn)), formattedXml.getBytes());
+        Files.write(Paths.get(String.valueOf(pathOfxIn)), formattedXml.getBytes());
 
         try (BufferedReader reader = Files.newBufferedReader(pathOfxIn, CHAR_SET);
              BufferedWriter writer = Files.newBufferedWriter(pathOfxOut, CHAR_SET)) {
@@ -1041,10 +1040,9 @@ public class SuncorpAusOfxFixController implements Initializable {
                     }
                 }
                 if (line.contains("<STMTTRN>")) {     // start of a transaction
-                    if(indentLength == 0)
+                    if(indentLengthSTMTTRN == 0)
                     {
-                        indentLength = findNonwhitespaceCharacter(line, indentLength);
-
+                        indentLengthSTMTTRN = findNonwhitespaceCharacter(line, indentLengthSTMTTRN);
                     }
                     boolInTransaction = true;
                     transIn++;
@@ -1063,8 +1061,8 @@ public class SuncorpAusOfxFixController implements Initializable {
                     } else {
                         if (line.contains("<DTPOSTED>")) {
                             // DTPOSTED is yyyymmddhhmmss
-                            //  (hhmmss is zeroes for SUNCORP Australia)
-                            dtPosted = Objects.requireNonNull(getLineXmlString("DTPOSTED", line)).substring(0, 8); // get yyyymmdd // TODO fix for suncorp and all
+                            //  (hhmmss is zeroes for Australia)
+                            dtPosted = Objects.requireNonNull(getLineXmlString("DTPOSTED", line)).substring(0, 8);
                             //                    System.out.println("handleBtnActionStart(): dtPosted=" + dtPosted);
                             if (dtPosted.matches("\\d\\d\\d\\d\\d\\d\\d\\d")
                             ) {
@@ -1072,7 +1070,7 @@ public class SuncorpAusOfxFixController implements Initializable {
                                         && (dtPosted.compareTo(txtDateTo.getText()) <= 0)) {
                                     boolTrnDateInRange = true;
                                     // Good STMTTRN so can write now, get the indent length in case
-                                    writer.write("\t\t\t<STMTTRN>" + LINE_SEPARATOR); //TODO Fix this to write the line correctly
+                                    writer.write(String.format("%" + indentLengthSTMTTRN + "s", "") + "<STMTTRN>" + LINE_SEPARATOR);
                                     writer.write(trnType);
                                     linesOut = linesOut + 2;
                                     transOut++;
@@ -1093,12 +1091,17 @@ public class SuncorpAusOfxFixController implements Initializable {
                                     continue;
                                 }
                             } else {
+                                // This is where the magic happens... FITID unique create (date based!)
                                 if (line.contains("<FITID>")) {
                                     if (boolTrnDateInRange) {
                                         if (line.contains(".")) {
                                             taLog.appendText("FITID has already been fixed: " + line + "\n");
                                         } else {
-                                            line = "\t\t\t<FITID>" + dtPosted + "." + trnAmt + "</FITID>"; //TODO Fix this to write the line correctly
+                                            if(indentLengthFITID == 0)
+                                            {
+                                                indentLengthFITID = findNonwhitespaceCharacter(line, indentLengthFITID);
+                                            }
+                                            line = String.format("%" + indentLengthFITID + "s", "") + "<FITID>" + dtPosted + "." + trnAmt + "</FITID>";
                                             transMod++;
                                             //                          taLog.appendText("New FITID: " + line + "\n");
                                         }
@@ -1124,10 +1127,10 @@ public class SuncorpAusOfxFixController implements Initializable {
                                             if (nameStr.isEmpty() && index > -1
                                                     && splitMemoChb.isSelected()) {
                                                 if (line.contains("NAME")) {
-                                                    nameStr = getLineXmlString("NAME", line); // TODO fix for suncorp and all
+                                                    nameStr = getLineXmlString("NAME", line);
                                                     writer.write(nameStr + LINE_SEPARATOR);
                                                     if (line.length() > (index + 2)) {
-                                                        line = getLineXmlString("MEMO", line); // TODO fix for suncorp and all
+                                                        line = getLineXmlString("MEMO", line);
                                                     }
                                                 }
                                             }
@@ -1138,7 +1141,9 @@ public class SuncorpAusOfxFixController implements Initializable {
                                                     continue;
                                                 }
                                             } else {
-                                                taLog.appendText("Unknown record type within STMTTRN: " + line + "\n");
+                                                if (!line.contains("<DTUSER>")) { // No hanlding, but known ofx field
+                                                    taLog.appendText("Unknown record type within STMTTRN: " + line + "\n");
+                                                }
                                                 if (!boolTrnDateInRange) {
                                                     continue;
                                                 }
@@ -1241,7 +1246,7 @@ public class SuncorpAusOfxFixController implements Initializable {
                 try {
                     txtOfxDir.setText(selectedDirectory.getCanonicalPath());
                 } catch (IOException ex) {
-                    Logger.getLogger(SuncorpAusOfxFixController.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(OfxFixController.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 getDatesFromFile();
                 enable_or_disable_buttons();
@@ -1267,14 +1272,14 @@ public class SuncorpAusOfxFixController implements Initializable {
 
         setTooltips();
 
-        // create dir $HOME/.SuncorpAusOfxFix if doesn't already exist
+        // create dir $HOME/.OfxFix if doesn't already exist
         Boolean boolPropDirOK = true;
         Path pthProp = Paths.get(DEF_PROP).getParent();
         if (!Files.exists(pthProp)) {
             try {
                 Files.createDirectory(pthProp);
             } catch (IOException ex) {
-                //Logger.getLogger(SuncorpAusOfxFixController.class.getName()).log(Level.SEVERE, null, ex);
+                //Logger.getLogger(OfxFixController.class.getName()).log(Level.SEVERE, null, ex);
                 boolPropDirOK = false;
                 taLog.setText("Error: Cannot create folder: " + pthProp.toString());
             }

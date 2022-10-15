@@ -1,4 +1,4 @@
-module suncorpOfx {
+module ofx {
     requires javafx.controls;
     requires javafx.fxml;
 

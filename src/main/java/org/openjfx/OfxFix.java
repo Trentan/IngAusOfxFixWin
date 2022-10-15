@@ -31,7 +31,7 @@ import java.io.IOException;
 
 /**
  * This project creates a new .ofx file from the file downloaded from
- *  SUNCORP Australia bank with the following modifications:
+ *  bank with the following modifications:
  *  1. add missing BANKACCTFROM xml entity before BANKTRANLIST.
  *      This is needed because GnuCash doesn't find any transactions to import
  *       without this.
@@ -49,15 +49,15 @@ import java.io.IOException;
  * @author mrNaturalOne
  */
 
-public class SuncorpAusOfxFix extends Application {
+public class OfxFix extends Application {
     private static Scene scene;
 
     @Override
     public void start(Stage stage) throws Exception {
-        scene = new Scene(loadFXML("SuncorpAusOfxFix"));
-        scene.getStylesheets().add(getClass().getResource("SuncorpAusOfxFix.css").toExternalForm());
+        scene = new Scene(loadFXML("OfxFix"));
+        scene.getStylesheets().add(getClass().getResource("OfxFix.css").toExternalForm());
         stage.setScene(scene);
-        stage.setTitle("Suncorp Australia OFX Fix");
+        stage.setTitle("OFX Fix");
         stage.show();
     }
 
@@ -66,7 +66,7 @@ public class SuncorpAusOfxFix extends Application {
     }
 
     private static Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(SuncorpAusOfxFix.class.getResource(fxml + ".fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(OfxFix.class.getResource(fxml + ".fxml"));
         return fxmlLoader.load();
     }
 

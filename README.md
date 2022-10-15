@@ -1,13 +1,13 @@
-#          SuncorpAusOfxFix V#2.01  13 Jan 2021 README.md file.
+#          OfxFix V#2.01  13 Jan 2021 README.md file.
 
-ING Australia OFX Fix for Windows (using JavaFX) or Linux (using OpenJFX)
+ING OFX Fix for Windows (using JavaFX) or Linux (using OpenJFX)
 
 This README.md is formatted for github markdown and is most easily read using a web browser
-to view https://github.com/goodvibes2/SuncorpAusOfxFixWin/blob/master/README.md.
+to view https://github.com/goodvibes2/OfxFixWin/blob/master/README.md.
 
-The last known SuncorpAusOfxFix stable series is
+The last known OfxFix stable series is
 
-|Java Version | SuncorpAusOfxFix Stable Series  |
+|Java Version | OfxFix Stable Series  |
 |---          | ---                         |
 | 8           | 1.01                        |
 | 11          | 2.01                        |
@@ -20,8 +20,8 @@ Please see:
 
   - [Overview](#Overview)
   - [Features](#Features)
-  - [Selecting SuncorpAusOfxFix Version](#SuncorpAusOfxFixVersion)
-  - [Selecting Precompiled SuncorpAusOfxFix or Compile Yourself](#PreCompiledOrCompile)
+  - [Selecting OfxFix Version](#OfxFixVersion)
+  - [Selecting Precompiled OfxFix or Compile Yourself](#PreCompiledOrCompile)
   - [Dependencies](#Dependencies)
   - [Running](#Running)
   - [Internationalization](#Internationalization)
@@ -29,13 +29,13 @@ Please see:
   - [Supported Platforms](#SupportedPlatforms)
   - [Known Issues](#KnownIssues)
 
-![Image of SuncorpAusOfxFix](https://github.com/goodvibes2/SuncorpAusOfxFixWin/blob/master/SuncorpAusOfxFix.PNG)
+![Image of OfxFix](https://github.com/goodvibes2/OfxFixWin/blob/master/OfxFix.PNG)
 
 <a name="Overview"></a>
 ## Overview ##
 
-SuncorpAusOfxFix is an application to automate the repetitive task of editing
-the file of bank transactions downloaded in OFX format from bank SUNCORP Australia
+OfxFix is an application to automate the repetitive task of editing
+the file of bank transactions downloaded in OFX format from bank Australia
 so that they may be imported into GnuCash.
 
 This application corrects 3 problems in the downloaded .ofx file:
@@ -55,7 +55,7 @@ This application is written in Java using JavaFX (or OpenJFX) for
 the graphical user interface. Java versions before 8 cannot be used with this
 application as they do not support JavaFX.
 
-The SuncorpAusOfxFix project is _not_ part of the GnuCash project.
+The OfxFix project is _not_ part of the GnuCash project.
 
 If you need help, please email goodchris96@gmail.com and I will help
 if I can and have time available.
@@ -67,15 +67,15 @@ Please read all of this document before asking for help.
 Features include
 
 - Available for both GNU/Linux and Microsoft Windows.
-SuncorpAusOfxFix has been tested in GNU/Linux Ubuntu 16.04 & 18.04 and Windows 10.
-GnuCash is also available for Mac OS/X and SuncorpAusOfxFix may work
+OfxFix has been tested in GNU/Linux Ubuntu 16.04 & 18.04 and Windows 10.
+GnuCash is also available for Mac OS/X and OfxFix may work
 but this has not (yet) been tested.
 
 - An easy-to-use interface.
-After downloading a .ofx file from the SUNCORP website, you just start SuncorpAusOfxFix,
+After downloading a .ofx file from the website, you just start OfxFix,
 select the saved bank account configuration using the Bank Account Name
 combobox, select any different options if required (such as the date range),
-select the downloaded .ofx file and click the Start button. SuncorpAusOfxFix
+select the downloaded .ofx file and click the Start button. OfxFix
 processes the input file and creates a new corrected file with the name of the
 original file but with the filename suffixed with 'New' before the .ofx
 extension. For example
@@ -149,12 +149,12 @@ problems as it checks that
      Split Memo fields into Name and Memo if they contain " - "
     (space-dash-space). Default is `true` (ticked).
 
-     In OFX files as exported from SUNCORP Australia, each transaction contains only a
+     In OFX files as exported from Australia, each transaction contains only a
      `<MEMO>` field but no `<NAME>` field. If GnuCash imports such a transaction,
      it loads the MEMO data into both transaction Description, and Memo for the
      the bank account split.
      If this checkbox is ticked, and there is no `<NAME>` field in the
-     transaction, and `<MEMO>` contains at least 1 " - ", SuncorpAusOfxFix will output
+     transaction, and `<MEMO>` contains at least 1 " - ", OfxFix will output
      text before the first " - " into `<NAME>` and text after the first " - " into
      `<MEMO>`. GnuCash will then load `<NAME>` into transaction Description and
      `<MEMO>` into Memo for the bank account split. As well as making the display
@@ -178,10 +178,10 @@ problems as it checks that
   clicked, will save these entries, the name of the default bank account and the
   value of Split Memo, for all bank accounts, in file
   ```
-    GNU/Linux: /home/[USER_NAME]/.SuncorpAusOfxFix/defaultProperties
-    Windows: C:\Users\USER_NAME]\.SuncorpAusOfxFix/defaultProperties
+    GNU/Linux: /home/[USER_NAME]/.OfxFix/defaultProperties
+    Windows: C:\Users\USER_NAME]\.OfxFix/defaultProperties
   ```
-  The next time SuncorpAusOfxFix is started, the saved settings will be
+  The next time OfxFix is started, the saved settings will be
   automatically loaded from the defaultProperties file, and the details for the
   default bank account shown.
 
@@ -203,23 +203,23 @@ problems as it checks that
   transactions into GnuCash with the default FITID as supplied by the bank. As
   there is a limited range of date selection criteria when downloading the
   transactions in OFX format from the bank website, limiting the date range of
-  transactions output from SuncorpAusOfxFix will stop GnuCash importing transactions
+  transactions output from OfxFix will stop GnuCash importing transactions
   which it doesn't recognise as duplicates because the FITID's are not the same.
 
 <a name="Home Page"></a>
 ### Home Page ###
 None
 
-<a name="SuncorpAusOfxFixVersion"></a>
-## Selecting SuncorpAusOfxFix Version ##
+<a name="OfxFixVersion"></a>
+## Selecting OfxFix Version ##
 
-SuncorpAusOfxFix V1.x runs in Java 8.
+OfxFix V1.x runs in Java 8.
 
-SuncorpAusOfxFix V2.x runs in Java 11.
+OfxFix V2.x runs in Java 11.
 
-SuncorpAusOfxFix versions 1.x and 2.x have the same functionality. Currently (Sep
+OfxFix versions 1.x and 2.x have the same functionality. Currently (Sep
 2019), the only difference is the version of Java they run in. Note that as Java
-8 is no longer being developed, future SuncorpAusOfxFix enhancements may not be
+8 is no longer being developed, future OfxFix enhancements may not be
 included in V1.x.
 
 **Definition**
@@ -228,8 +228,8 @@ included in V1.x.
 Java Runtime Environment. Simplified - All the files needed to run a Java
 program.
 
-If you already have a Java 8 JRE installed, you can run SuncorpAusOfxFix V1.x.
-You should run SuncorpAusOfxFix V2.x if you do not have a Java 8 JRE already
+If you already have a Java 8 JRE installed, you can run OfxFix V1.x.
+You should run OfxFix V2.x if you do not have a Java 8 JRE already
 installed.
 
 **Windows**: You can download and install a Java 8 JRE if you wish. A JRE is not
@@ -241,13 +241,13 @@ included with Windows.
 
 **Ubuntu 16.04 (or Mint 18)**
   Only has Java 8 available so if you already have Java 8 installed, you can
-  save some disk space by using the latest SuncorpAusOfxFix V1.x. You can still use
-  SuncorpAusOfxFix V2.x or later if you wish.
+  save some disk space by using the latest OfxFix V1.x. You can still use
+  OfxFix V2.x or later if you wish.
 
 **Ubuntu 18.04 (or Mint 19)**
   Has both Java 8 and Java 11 and you can set the system to use either 8 or 11.
   If you have another application that requires Java 8 and you have limited
-  disk space, then you could use SuncorpAusOfxFix V1.x, otherwise you should use
+  disk space, then you could use OfxFix V1.x, otherwise you should use
   V2.x or later.
 
 <a name="DowngradeUbuntu18.04ToJava8"></a>
@@ -296,12 +296,12 @@ it to Java 11. To set your Ubuntu 18.04 Java 11 system back to Java 8:
   ```
 
 <a name="PreCompiledOrCompile"></a>
-## Selecting to Use Precompiled SuncorpAusOfxFix or Compile Yourself ##
+## Selecting to Use Precompiled OfxFix or Compile Yourself ##
 
 There are 2 ways to use this application
 
   1. Use the Precompiled Binaries (programs) attached to this GitHub project -
-     Download the prebuilt SuncorpAusOfxFix.jar (Java 8) or Runtime Image (Java
+     Download the prebuilt OfxFix.jar (Java 8) or Runtime Image (Java
      11).
 
      This application comes with no warranty and you should think about the
@@ -316,47 +316,47 @@ There are 2 ways to use this application
 
 ### Precompiled binaries ###
 
-#### SuncorpAusOfxFix V1.x for Java 8 ####
+#### OfxFix V1.x for Java 8 ####
 
-To run **SuncorpAusOfxFix V1.x**, you need to have a Java 8 JRE already installed
-and you just need to download SuncorpAusOfxFix.jar from GitHub.
+To run **OfxFix V1.x**, you need to have a Java 8 JRE already installed
+and you just need to download OfxFix.jar from GitHub.
 
-**To download SuncorpAusOfxFix.jar**
+**To download OfxFix.jar**
 
 Copy and Paste one of the following URL's into a web browser
 ```
-  https://github.com/goodvibes2/SuncorpAusOfxFixWin/releases
+  https://github.com/goodvibes2/OfxFixWin/releases
   or
-  https://github.com/goodvibes2/SuncorpAusOfxFixLinux/releases
+  https://github.com/goodvibes2/OfxFixLinux/releases
 ```
 
-SuncorpAusOfxFix has been written so that the same source files will work in both
+OfxFix has been written so that the same source files will work in both
 GNU/Linux and Windows. Being Java bytecode built from the same Java source files,
-SuncorpAusOfxFix.jar from either SuncorpAusOfxFixWin or SuncorpAusOfxFixLinux should work in
+OfxFix.jar from either OfxFixWin or OfxFixLinux should work in
 both GNU/Linux and Windows.
 
 Find the latest V1.x Release, find the Assets section and click on
-SuncorpAusOfxFix.jar to download it.
+OfxFix.jar to download it.
 
 Usually it downloads to your *Downloads* folder.
-Move the downloaded SuncorpAusOfxFix.jar from your *Downloads* folder to a more
+Move the downloaded OfxFix.jar from your *Downloads* folder to a more
 appropriate folder.
 
 I suggest
 ```
-GNU/Linux              /home/[USERNAME]/SuncorpAusOfxFix/SuncorpAusOfxFix.jar
-Windows   C:\Users\[USERNAME]\Documents\SuncorpAusOfxFix\SuncorpAusOfxFix.jar
+GNU/Linux              /home/[USERNAME]/OfxFix/OfxFix.jar
+Windows   C:\Users\[USERNAME]\Documents\OfxFix\OfxFix.jar
 ```
 
-#### SuncorpAusOfxFix V2.x for Java 11 ####
+#### OfxFix V2.x for Java 11 ####
 
-Java modular applications were introduced in Java 9. SuncorpAusOfxFix V2.x is a
+Java modular applications were introduced in Java 9. OfxFix V2.x is a
 modular Java 11 application.
 
 It is **not** possible to run a modular java app from a .jar file even if you
 have an appropriate JRE already installed.
 
-To run SuncorpAusOfxFix V2.x, you do NOT need a Java Runtime Environment (JRE)
+To run OfxFix V2.x, you do NOT need a Java Runtime Environment (JRE)
 already installed as the app is distributed as a Runtime Image which includes
 the required JRE and all the files needed.
 
@@ -368,21 +368,21 @@ Disadvantages of a Java Runtime Image:
 Advantages:
   - Totally independent of any other installed JRE.
 
-**To download a SuncorpAusOfxFix V2.x Runtime Image (includes a Java 11 JRE)**
+**To download a OfxFix V2.x Runtime Image (includes a Java 11 JRE)**
 
 Copy and Paste one of the following URL's into a web browser depending on your
 target platform (Windows or Linux)
 ```
-  https://github.com/goodvibes2/SuncorpAusOfxFixWin/releases
+  https://github.com/goodvibes2/OfxFixWin/releases
   or
-  https://github.com/goodvibes2/SuncorpAusOfxFixLinux/releases
+  https://github.com/goodvibes2/OfxFixLinux/releases
 ```
 
 Find the latest V2.x Release, then find the Assets section. To download the
 Runtime Image archive, click on
 ```
-GNU/Linux       SuncorpAusOfxFix_rel2.nn.tar.gz
-Windows         SuncorpAusOfxFix_rel2.nn.zip
+GNU/Linux       OfxFix_rel2.nn.tar.gz
+Windows         OfxFix_rel2.nn.zip
 ```
 where 2.nn is the required release.
 
@@ -392,8 +392,8 @@ appropriate folder.
 
 I suggest the following folders
 ```
-GNU/Linux              /home/[USERNAME]/SuncorpAusOfxFix/v2.nn
-Windows   C:\Users\[USERNAME]\Documents\SuncorpAusOfxFix\v2.nn
+GNU/Linux              /home/[USERNAME]/OfxFix/v2.nn
+Windows   C:\Users\[USERNAME]\Documents\OfxFix\v2.nn
 ```
 where 2.nn is the required release.
 
@@ -401,8 +401,8 @@ Unpack the Runtime Image
 
 **GNU/Linux**
 ```
-cd /home/[USERNAME]/SuncorpAusOfxFix/v2.nn
-tar zxf SuncorpAusOfxFix_rel2.nn.tar.gz
+cd /home/[USERNAME]/OfxFix/v2.nn
+tar zxf OfxFix_rel2.nn.tar.gz
 ```
 where 2.nn is the required release.
 
@@ -411,19 +411,19 @@ Use 7-Zip in a command prompt window to unpack all the files from the
 Runtime Image archive to the current directory
 ```
 C:
-cd \Users\[USERNAME]\Documents\SuncorpAusOfxFix\v2.nn
-"C:\Program Files\7-Zip\7z.exe" x SuncorpAusOfxFix_rel2.nn.zip
+cd \Users\[USERNAME]\Documents\OfxFix\v2.nn
+"C:\Program Files\7-Zip\7z.exe" x OfxFix_rel2.nn.zip
 ```
 where 2.nn is the required release.
 
 <a name="Dependencies"></a>
 ## Dependencies ##
 
-### Dependencies for using prebuilt SuncorpAusOfxFix.jar V1.x in Java 8 ###
+### Dependencies for using prebuilt OfxFix.jar V1.x in Java 8 ###
 
 (See [Building and Installing](#BuildingAndInstalling) below if you wish to build from source)
 
-If you wish to download and use the prebuilt SuncorpAusOfxFix.jar from
+If you wish to download and use the prebuilt OfxFix.jar from
 this github project, the following packages need to be installed
 
 #### GNU/Linux ####
@@ -431,7 +431,7 @@ These instructions are for Ubuntu 18.04 but should be similar for other
 Gnu/Linux flavours/versions.
 
 ##### Java #####
-SuncorpAusOfxFix V1.x uses Java version 8 and JavaFX.
+OfxFix V1.x uses Java version 8 and JavaFX.
 These can be either the open **or** Oracle versions.
 
 See also [Known Issues](#KnownIssues).
@@ -470,35 +470,35 @@ http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.h
 
 See also [Known Issues](#KnownIssues).
 
-### Dependencies for using prebuilt SuncorpAusOfxFix V2.x Runtime Image (Java 11) ###
+### Dependencies for using prebuilt OfxFix V2.x Runtime Image (Java 11) ###
 
 (See [Building and Installing](#BuildingAndInstalling) below if you wish to
 build from source)
 
-If you wish to download and use the prebuilt SuncorpAusOfxFix V2.x Runtime Image
+If you wish to download and use the prebuilt OfxFix V2.x Runtime Image
 from this GitHub project, the following packages need to be installed
 
 #### GNU/Linux & Windows ####
 
 ##### Java #####
 
-As the Prebuilt SuncorpAusOfxFix Runtime Image V2.x includes a Java 11 RTE and
+As the Prebuilt OfxFix Runtime Image V2.x includes a Java 11 RTE and
 openjfx, it is **not** neccessary to install java or openjfx separately.
 
 
 <a name="Running"></a>
 ## Running ##
 
-### Running SuncorpAusOfxFix V1.x for Java 8 (SuncorpAusOfxFix.jar) ###
+### Running OfxFix V1.x for Java 8 (OfxFix.jar) ###
 
 ### GNU/Linux ###
   To run the project from the command line, type the following
 ```
-    java -jar "[PathTo]/SuncorpAusOfxFix.jar" &
+    java -jar "[PathTo]/OfxFix.jar" &
 ```
 E.g.
 ```
-    java -jar /home/[USER_NAME]/SuncorpAusOfxFix/SuncorpAusOfxFix.jar &
+    java -jar /home/[USER_NAME]/OfxFix/OfxFix.jar &
 ```
 **Ubuntu** To set up an ingausofxfix.desktop file so it can be started from the
 Unity Dash
@@ -512,15 +512,15 @@ or
 containing
 ```
 [Desktop Entry]
-Name=SuncorpAusOfxFix
+Name=OfxFix
 Comment=ING Aus OFX Fix
-Exec=java -jar /home/[USER_NAME]/SuncorpAusOfxFix/SuncorpAusOfxFix.jar
+Exec=java -jar /home/[USER_NAME]/OfxFix/OfxFix.jar
 Icon=gnucash-icon
 Terminal=false
 Type=Application
 Categories=Office;Finance;
 ```
-Ensure the **Exec=** line above points to where you put **SuncorpAusOfxFix.jar**.
+Ensure the **Exec=** line above points to where you put **OfxFix.jar**.
 
 You can also create a shortcut on your **Desktop** by copying ingausofxfix.desktop
 to ~/Desktop. Ensure it has execute permissions or you will get error
@@ -537,26 +537,26 @@ Right click on the desktop,
 New, Shortcut,
 Type in the full command
 ```
-"C:\Program Files (x86)\Common Files\Oracle\Java\javapath\javaw.exe" -jar C:\Users\[USER_NAME]\Documents\SuncorpAusOfxFix\SuncorpAusOfxFix.jar
+"C:\Program Files (x86)\Common Files\Oracle\Java\javapath\javaw.exe" -jar C:\Users\[USER_NAME]\Documents\OfxFix\OfxFix.jar
 ```
-Name the shortcut **SuncorpAusOfxFix**.
+Name the shortcut **OfxFix**.
 
 If you wish to see stdout or stderr for debugging, use **java.exe** instead of
 **javaw.exe** in the command above. Javaw.exe is intended for gui (window)
-applications (like SuncorpAusOfxFix) and does not show a console window.
+applications (like OfxFix) and does not show a console window.
 
-### Running SuncorpAusOfxFix V2.x for Java 11 (Runtime Image) ###
+### Running OfxFix V2.x for Java 11 (Runtime Image) ###
 
 #### GNU/Linux ####
 
   To run the app from the command line, type the following
 ```
-  ~/SuncorpAusOfxFix/v2.nn/dist/jlink/SuncorpAusOfxFixJ11/bin/SuncorpAusOfxFix &
+  ~/OfxFix/v2.nn/dist/jlink/OfxFixJ11/bin/OfxFix &
 ```
 where 2.nn is the required release.
 E.g.
 ```
-  ~/SuncorpAusOfxFix/v2.00/dist/jlink/SuncorpAusOfxFixJ11/bin/SuncorpAusOfxFix &
+  ~/OfxFix/v2.00/dist/jlink/OfxFixJ11/bin/OfxFix &
 ```
 **Ubuntu** To set up an ingausofxfix.desktop file so it can be started from the
 Unity Dash or *Gnome Applications overview*
@@ -570,9 +570,9 @@ or
 containing
 ```
 [Desktop Entry]
-Name=SuncorpAusOfxFix
+Name=OfxFix
 Comment=ING Aus OFX Fix
-Exec=/home/[UserName]/SuncorpAusOfxFix/v2.nn/dist/jlink/SuncorpAusOfxFixJ11/bin/SuncorpAusOfxFix
+Exec=/home/[UserName]/OfxFix/v2.nn/dist/jlink/OfxFixJ11/bin/OfxFix
 Icon=gnucash-icon
 Terminal=false
 Type=Application
@@ -594,36 +594,36 @@ Create a shortcut on your desktop
 
 Right click on the desktop,
 New, Shortcut,
-Browse to and select your SuncorpAusOfxFix.bat file
+Browse to and select your OfxFix.bat file
 or just type in the full filestring E.g
 ```
-C:\Users\[USERNAME]\Documents\SuncorpAusOfxFix\v2.nn\dist\jlink\SuncorpAusOfxFixJ11\bin\SuncorpAusOfxFix.bat
+C:\Users\[USERNAME]\Documents\OfxFix\v2.nn\dist\jlink\OfxFixJ11\bin\OfxFix.bat
 ```
 where 2.nn is the required release.
-Name the shortcut **SuncorpAusOfxFix**.
+Name the shortcut **OfxFix**.
 
 
 <a name="Internationalization"></a>
 ## Internationalization ##
 --------------------
 
-SuncorpAusOfxFix is currently English only.
+OfxFix is currently English only.
 
 
 <a name="BuildingAndInstalling"></a>
 ## Building and Installing ##
 ---------------------
 
-There are 2 versions of SuncorpAusOfxFix on GitHub
-- https://github.com/goodvibes2/SuncorpAusOfxFixWin
+There are 2 versions of OfxFix on GitHub
+- https://github.com/goodvibes2/OfxFixWin
   which is the NetBeans IDE 8.2 project for Microsoft Windows using
   Oracle Java 8 (Includes JavaFX) or Oracle Java 11 and Gluon JavaFX 11.0.2
-- https://github.com/goodvibes2/SuncorpAusOfxFixLinux
+- https://github.com/goodvibes2/OfxFixLinux
   which is the NetBeans IDE 8.1 project for GNU/Linux Ubuntu 18.04 using
   Java OpenJDK 8 (and OpenJFX 8) or Oracle Java 11 and Gluon OpenJFX 11.0.2
 
 The java source files in both the above projects should be identical
-and the dist/SuncorpAusOfxFix.jar files in both, being Java bytecode, should
+and the dist/OfxFix.jar files in both, being Java bytecode, should
 work in both GNU/Linux and Windows with a Java 8 JRE. The differences between
 these projects are only in the NetBeans project files used for building the
 project. This is so as to make it easy to download (or clone) the project, set up
@@ -632,7 +632,7 @@ it without any further setup.
 
 ### **Note** This project was developed and tested using ###
 
-**SuncorpAusOfxFix V1.x for Java 8**
+**OfxFix V1.x for Java 8**
 
 **GNU/Linux**
 ```
@@ -650,7 +650,7 @@ it without any further setup.
       NetBeans IDE 8.2
 ```
 
-**SuncorpAusOfxFix V2.x for Java 11**
+**OfxFix V2.x for Java 11**
 
 **GNU/Linux**
 ```
@@ -672,7 +672,7 @@ it without any further setup.
       Apache NetBeans IDE 11.0
 ```
 
-### Build the V1.x SuncorpAusOfxFix.jar from source ###
+### Build the V1.x OfxFix.jar from source ###
 You will need
 
 ### GNU/Linux ###
@@ -680,7 +680,7 @@ You will need
 Gnu/Linux flavours/versions.
 
 #### Java ####
-SuncorpAusOfxFix uses Java version 8 and JavaFX (or OpenJFX).
+OfxFix uses Java version 8 and JavaFX (or OpenJFX).
 These can be EITHER the open OR Oracle versions.
 
 ##### Openjdk #####
@@ -690,7 +690,7 @@ sudo apt-get install openjdk-8-jdk openjfx
 ```
 
 Ubuntu 18.04 includes Java 8 and Java 11.
-SuncorpAusOfxFix V1.x needs Java 8, so set the default Java version to 8. See
+OfxFix V1.x needs Java 8, so set the default Java version to 8. See
 [Downgrade Ubuntu 18.04 Java 11 to Java 8](#DowngradeUbuntu18.04ToJava8)
 
 OR
@@ -703,7 +703,7 @@ the jdk from http://www.oracle.com/technetwork/java/javase/downloads/index-jsp-1
 
 #### SceneBuilder ####
 SceneBuilder is the gui tool for modifying the user interface, details
-of which are held in SuncorpAusOfxFix.fxml.
+of which are held in OfxFix.fxml.
 You only need to install SceneBuilder if you wish to modify the user
 interface.
 
@@ -728,7 +728,7 @@ sudo apt-get install netbeans
 ### Windows ###
 
 #### Java ####
-SuncorpAusOfxFix V1.x uses Java version 8 and JavaFX.
+OfxFix V1.x uses Java version 8 and JavaFX.
     Openjdk and OpenJFX are NOT available for Windows, so use Oracle versions.
 
 ##### Oracle Java 8 jdk (includes JavaFX) #####
@@ -740,7 +740,7 @@ the jdk from http://www.oracle.com/technetwork/java/javase/downloads/index-jsp-1
 
 #### SceneBuilder ####
 SceneBuilder is the gui tool for modifying the user interface, details
-of which are held in SuncorpAusOfxFix.fxml.
+of which are held in OfxFix.fxml.
 You only need to install SceneBuilder if you wish to modify the user
 interface.
 
@@ -760,7 +760,7 @@ Follow the instructions at https://openjfx.io/openjfx-docs/#introduction
 including the instructions for using JavaFX and NetBeans to build a
 Modular app from the IDE (NetBeans).
 
-**Note** The instructions on the above webpage are for Java 12 but SuncorpAusOfxFix
+**Note** The instructions on the above webpage are for Java 12 but OfxFix
 V2.x was built for Java 11 as that was the version available in the Ubuntu 18.04
 repositories. Substitute Java 11 for Java 12 in the above webpage instructions.
 
@@ -776,7 +776,7 @@ You will need
 GNU/Linux flavours/versions.
 
 ##### Java JDK #####
-SuncorpAusOfxFix V2.x uses Oracle Java jdk version 11
+OfxFix V2.x uses Oracle Java jdk version 11
 
 Download jdk-11.0.4_linux-x64_bin.tar.gz from Oracle http://jdk.java.net/11/.
 The .gz contains base directory jdk-11.0.4.
@@ -816,7 +816,7 @@ This will create $HOME/java/javafx-jmods-11.0.2/...
 
 ##### SceneBuilder #####
 SceneBuilder is the gui tool for modifying the user interface, details
-of which are held in SuncorpAusOfxFix.fxml.
+of which are held in OfxFix.fxml.
 You only need to install SceneBuilder if you wish to modify the user
 interface.
 
@@ -863,7 +863,7 @@ StartupNotify=true
 #### Windows ####
 
 ##### Java #####
-SuncorpAusOfxFix V2.x uses Java JDK version 11 and openjfx.
+OfxFix V2.x uses Java JDK version 11 and openjfx.
 
 ###### Oracle Java JDK 11 ######
 Openjdk 11 is only available from Oracle. You will need a free Oracle account
@@ -906,7 +906,7 @@ This will create C:\Program Files\Java\javafx-jmods-11.0.2\\...
 
 ##### SceneBuilder #####
 SceneBuilder is the gui tool for modifying the user interface, details
-of which are held in SuncorpAusOfxFix.fxml.
+of which are held in OfxFix.fxml.
 You only need to install SceneBuilder if you wish to modify the user
 interface.
 
@@ -929,21 +929,21 @@ Create a desktop shortcut pointing to
 
 #### To download the source files and NetBeans project ####
 
-There are 2 versions of SuncorpAusOfxFix on github
-- https://github.com/goodvibes2/SuncorpAusOfxFixWin
+There are 2 versions of OfxFix on github
+- https://github.com/goodvibes2/OfxFixWin
   which is the project for Microsoft Windows
-- https://github.com/goodvibes2/SuncorpAusOfxFixLinux
+- https://github.com/goodvibes2/OfxFixLinux
   which is the project for GNU/Linux
 
 The java source files in both the above projects should be identical
-and the dist/SuncorpAusOfxFix.jar files in both should work in both GNU/Linux
+and the dist/OfxFix.jar files in both should work in both GNU/Linux
 or Windows. The differences between these projects are only in the NetBeans
 project files used for building the project. This is so as to make it easy
 to download (or clone) the project, set up the dependencies, and then be
 able to open the project in NetBeans, and be able to build it without any
 further setup.
 
-There are 2 main ways to download the SuncorpAusOfxFix NetBeans project from github
+There are 2 main ways to download the OfxFix NetBeans project from github
 
 1) **Clone** (if you already have a github account and git installed)
 
@@ -952,22 +952,22 @@ There are 2 main ways to download the SuncorpAusOfxFix NetBeans project from git
       cd
       mkdir NetBeansProjects
       cd NetBeansProjects
-      git clone https://github.com/goodvibes2/SuncorpAusOfxFixLinux SuncorpAusOfxFix
+      git clone https://github.com/goodvibes2/OfxFixLinux OfxFix
    ```
    **Windows** In a **git** shell
    ```
       cd ~/Documents
       mdkir NetBeansProjects
       cd NetBeansProjects
-      git clone https://github.com/goodvibes2/SuncorpAusOfxFixWin SuncorpAusOfxFix
+      git clone https://github.com/goodvibes2/OfxFixWin OfxFix
    ```
 
-##### SuncorpAusOfxFix V1.x Java 8 Extra Task #####
+##### OfxFix V1.x Java 8 Extra Task #####
    As the master branch has now been updated to Java 11, you need to reset back to
    the last commit before Java 11 was merged into master. To create a new branch
    (called say java8)
    ```
-     cd SuncorpAusOfxFix
+     cd OfxFix
    GNU/Linux:
      git checkout -b java8 85ba487d6cba6fda081dbaf2fb154273332b3215
    Windows:
@@ -981,9 +981,9 @@ OR
    Copy and Paste one of the following URL's into a web browser depending on your
    target platform (Windows or Linux)
    ```
-     https://github.com/goodvibes2/SuncorpAusOfxFixWin/releases
+     https://github.com/goodvibes2/OfxFixWin/releases
     or
-     https://github.com/goodvibes2/SuncorpAusOfxFixLinux/releases
+     https://github.com/goodvibes2/OfxFixLinux/releases
    ```
 
    Find the latest V1.x or V2.x Release as required, then find the Assets section.
@@ -994,8 +994,8 @@ OR
    ```
    This will download source code archive file
    ```
-   GNU/Linux       SuncorpAusOfxFixLinux-v.nn.tar.gz
-   Windows         SuncorpAusOfxFixWin-v.nn.zip
+   GNU/Linux       OfxFixLinux-v.nn.tar.gz
+   Windows         OfxFixWin-v.nn.zip
    ```
    where v.nn is the required release.
 
@@ -1014,7 +1014,7 @@ OR
    **GNU/Linux**
    ```
      cd /home/[USERNAME]/NetBeansProjects
-     tar zxf SuncorpAusOfxFixLinux-v.nn.tar.gz
+     tar zxf OfxFixLinux-v.nn.tar.gz
    ```
    where v.nn is the required release.
 
@@ -1024,7 +1024,7 @@ OR
    ```
    C:
    cd \Users\[USERNAME]\Documents\NetBeansProjects
-   "C:\Program Files\7-Zip\7z.exe" x SuncorpAusOfxFixWin-v.n.n.zip
+   "C:\Program Files\7-Zip\7z.exe" x OfxFixWin-v.n.n.zip
    ```
    where v.nn is the required release.
 
@@ -1041,12 +1041,12 @@ following files to ensure the paths match your project
 <a name="SupportedPlatforms"></a>
 ## Supported Platforms ##
 
-SuncorpAusOfxFix is known to work with the following operating systems
+OfxFix is known to work with the following operating systems
 
 - GNU/Linux             -- x86
 - Windows               -- x86
 
-SuncorpAusOfxFix can probably be made to work on any platform where GnuCash
+OfxFix can probably be made to work on any platform where GnuCash
 does, so long as the [Dependencies](#Dependencies) are available.
 
 <a name="KnownIssues"></a>
@@ -1074,6 +1074,6 @@ does, so long as the [Dependencies](#Dependencies) are available.
    http://stackoverflow.com/questions/38342046/how-to-use-a-sortedlist-with-javafx-editable-combobox-strange-onaction-events
 
 
-I hope you find SuncorpAusOfxFix useful.
+I hope you find OfxFix useful.
 
 Thank you.
