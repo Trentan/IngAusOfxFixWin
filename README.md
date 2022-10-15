@@ -22,6 +22,7 @@ Please see:
   - [Features](#Features)
   - [Selecting OfxFix Version](#OfxFixVersion)
   - [Selecting Precompiled OfxFix or Compile Yourself](#PreCompiledOrCompile)
+  - [Compile Yourself (build jar file)](#CompileJar)
   - [Dependencies](#Dependencies)
   - [Running](#Running)
   - [Internationalization](#Internationalization)
@@ -296,23 +297,27 @@ it to Java 11. To set your Ubuntu 18.04 Java 11 system back to Java 8:
   ```
 
 <a name="PreCompiledOrCompile"></a>
-## Selecting to Use Precompiled OfxFix or Compile Yourself ##
+## Selecting to Use Precompiled OfxFix##
 
-There are 2 ways to use this application
+There are 2 ways to use this application - use the compiled jar or compile yourself
 
-  1. Use the Precompiled Binaries (programs) attached to this GitHub project -
-     Download the prebuilt OfxFix.jar (Java 8) or Runtime Image (Java
-     11).
+Use the Precompiled Binaries (programs) attached to this GitHub project -
+Download the prebuilt OfxFix.jar (Java 8) or Runtime Image (Java  11).
 
      This application comes with no warranty and you should think about the
      security implications of using software downloaded from the internet. You
      are trusting my good nature and the codebase from which this is built!
      This code has not been security audited.
 
-  OR
+<a name="CompileJar"></a>
+## Compile executable jar file (easy with intelliJ) ##
 
-  2. Download the project source from GitHub, check the code for security and
-     build your own binary.
+Download the project source from GitHub, check the code for security and
+build your own binary. (See below)
+
+Compile .jar file with intelliJ is simple - use the maven tool window -> lifecycle -> package. 
+That will generate the .jar file into target, use that to execute!
+
 
 ### Precompiled binaries ###
 
