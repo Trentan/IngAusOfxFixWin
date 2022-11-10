@@ -487,8 +487,8 @@ public class OfxFixController implements Initializable {
                 Document document = builder.parse(new File(String.valueOf(pathOfxDirFilStr)));
 
                 // These are unique elements in OFX so can be relied on
-                dateMin = getXmlString("DTSTART", document.getDocumentElement());
-                dateMax = getXmlString("DTEND", document.getDocumentElement());
+                dateMin = getXmlString("DTSTART", document.getDocumentElement()).substring(0,8);
+                dateMax = getXmlString("DTEND", document.getDocumentElement()).substring(0,8);
 
                 if (dateMin != null && dateMax != null) { // Found the start and end date
                     txtDateFrom.setText(dateMin);
@@ -1092,7 +1092,7 @@ public class OfxFixController implements Initializable {
                                 }
                             } else {
                                 // This is where the magic happens... FITID unique create (date based!)
-                                if (line.contains("<FITID>")) {
+                                if (line.contains("<FITID>") || line.contains("FITID") ) {
                                     if (boolTrnDateInRange) {
                                         if (line.contains(".")) {
                                             taLog.appendText("FITID has already been fixed: " + line + "\n");
